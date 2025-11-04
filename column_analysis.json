@@ -1,0 +1,2537 @@
+[
+  {
+    "column": "iid",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 551,
+    "sample_values": [
+      "1",
+      "1",
+      "1"
+    ]
+  },
+  {
+    "column": "id",
+    "coverage": 100.0,
+    "non_null": 8377,
+    "null_count": 1,
+    "dtype": "float64",
+    "unique_count": 22,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "gender",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 2,
+    "sample_values": [
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  {
+    "column": "idg",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 44,
+    "sample_values": [
+      "1",
+      "1",
+      "1"
+    ]
+  },
+  {
+    "column": "condtn",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 2,
+    "sample_values": [
+      "1",
+      "1",
+      "1"
+    ]
+  },
+  {
+    "column": "wave",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 21,
+    "sample_values": [
+      "1",
+      "1",
+      "1"
+    ]
+  },
+  {
+    "column": "round",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 15,
+    "sample_values": [
+      "10",
+      "10",
+      "10"
+    ]
+  },
+  {
+    "column": "position",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 22,
+    "sample_values": [
+      "7",
+      "7",
+      "7"
+    ]
+  },
+  {
+    "column": "positin1",
+    "coverage": 78.0,
+    "non_null": 6532,
+    "null_count": 1846,
+    "dtype": "float64",
+    "unique_count": 22,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "2.0"
+    ]
+  },
+  {
+    "column": "order",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 22,
+    "sample_values": [
+      "4",
+      "3",
+      "10"
+    ]
+  },
+  {
+    "column": "partner",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 22,
+    "sample_values": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "column": "pid",
+    "coverage": 99.9,
+    "non_null": 8368,
+    "null_count": 10,
+    "dtype": "float64",
+    "unique_count": 551,
+    "sample_values": [
+      "11.0",
+      "12.0",
+      "13.0"
+    ]
+  },
+  {
+    "column": "match",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 2,
+    "sample_values": [
+      "0",
+      "0",
+      "1"
+    ]
+  },
+  {
+    "column": "int_corr",
+    "coverage": 98.1,
+    "non_null": 8220,
+    "null_count": 158,
+    "dtype": "float64",
+    "unique_count": 155,
+    "sample_values": [
+      "0.14",
+      "0.54",
+      "0.16"
+    ]
+  },
+  {
+    "column": "samerace",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 2,
+    "sample_values": [
+      "0",
+      "0",
+      "1"
+    ]
+  },
+  {
+    "column": "age_o",
+    "coverage": 98.8,
+    "non_null": 8274,
+    "null_count": 104,
+    "dtype": "float64",
+    "unique_count": 24,
+    "sample_values": [
+      "27.0",
+      "22.0",
+      "22.0"
+    ]
+  },
+  {
+    "column": "race_o",
+    "coverage": 99.1,
+    "non_null": 8305,
+    "null_count": 73,
+    "dtype": "float64",
+    "unique_count": 5,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "4.0"
+    ]
+  },
+  {
+    "column": "pf_o_att",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "float64",
+    "unique_count": 94,
+    "sample_values": [
+      "35.0",
+      "60.0",
+      "19.0"
+    ]
+  },
+  {
+    "column": "pf_o_sin",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "float64",
+    "unique_count": 78,
+    "sample_values": [
+      "20.0",
+      "0.0",
+      "18.0"
+    ]
+  },
+  {
+    "column": "pf_o_int",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "float64",
+    "unique_count": 65,
+    "sample_values": [
+      "20.0",
+      "0.0",
+      "19.0"
+    ]
+  },
+  {
+    "column": "pf_o_fun",
+    "coverage": 98.8,
+    "non_null": 8280,
+    "null_count": 98,
+    "dtype": "float64",
+    "unique_count": 71,
+    "sample_values": [
+      "20.0",
+      "40.0",
+      "18.0"
+    ]
+  },
+  {
+    "column": "pf_o_amb",
+    "coverage": 98.7,
+    "non_null": 8271,
+    "null_count": 107,
+    "dtype": "float64",
+    "unique_count": 82,
+    "sample_values": [
+      "0.0",
+      "0.0",
+      "14.0"
+    ]
+  },
+  {
+    "column": "pf_o_sha",
+    "coverage": 98.5,
+    "non_null": 8249,
+    "null_count": 129,
+    "dtype": "float64",
+    "unique_count": 85,
+    "sample_values": [
+      "5.0",
+      "0.0",
+      "12.0"
+    ]
+  },
+  {
+    "column": "dec_o",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 2,
+    "sample_values": [
+      "0",
+      "0",
+      "1"
+    ]
+  },
+  {
+    "column": "attr_o",
+    "coverage": 97.5,
+    "non_null": 8166,
+    "null_count": 212,
+    "dtype": "float64",
+    "unique_count": 18,
+    "sample_values": [
+      "6.0",
+      "7.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "sinc_o",
+    "coverage": 96.6,
+    "non_null": 8091,
+    "null_count": 287,
+    "dtype": "float64",
+    "unique_count": 14,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "intel_o",
+    "coverage": 96.3,
+    "non_null": 8072,
+    "null_count": 306,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "8.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "fun_o",
+    "coverage": 95.7,
+    "non_null": 8018,
+    "null_count": 360,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "8.0",
+      "7.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "amb_o",
+    "coverage": 91.4,
+    "non_null": 7656,
+    "null_count": 722,
+    "dtype": "float64",
+    "unique_count": 15,
+    "sample_values": [
+      "8.0",
+      "7.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "shar_o",
+    "coverage": 87.2,
+    "non_null": 7302,
+    "null_count": 1076,
+    "dtype": "float64",
+    "unique_count": 15,
+    "sample_values": [
+      "6.0",
+      "5.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "like_o",
+    "coverage": 97.0,
+    "non_null": 8128,
+    "null_count": 250,
+    "dtype": "float64",
+    "unique_count": 18,
+    "sample_values": [
+      "7.0",
+      "8.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "prob_o",
+    "coverage": 96.2,
+    "non_null": 8060,
+    "null_count": 318,
+    "dtype": "float64",
+    "unique_count": 19,
+    "sample_values": [
+      "4.0",
+      "4.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "met_o",
+    "coverage": 95.4,
+    "non_null": 7993,
+    "null_count": 385,
+    "dtype": "float64",
+    "unique_count": 7,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "age",
+    "coverage": 98.9,
+    "non_null": 8283,
+    "null_count": 95,
+    "dtype": "float64",
+    "unique_count": 24,
+    "sample_values": [
+      "21.0",
+      "21.0",
+      "21.0"
+    ]
+  },
+  {
+    "column": "field",
+    "coverage": 99.2,
+    "non_null": 8315,
+    "null_count": 63,
+    "dtype": "object",
+    "unique_count": 259,
+    "sample_values": [
+      "Law",
+      "Law",
+      "Law"
+    ]
+  },
+  {
+    "column": "field_cd",
+    "coverage": 99.0,
+    "non_null": 8296,
+    "null_count": 82,
+    "dtype": "float64",
+    "unique_count": 18,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "undergra",
+    "coverage": 58.7,
+    "non_null": 4914,
+    "null_count": 3464,
+    "dtype": "object",
+    "unique_count": 241,
+    "sample_values": [
+      "George Mason University",
+      "George Mason University",
+      "George Mason University"
+    ]
+  },
+  {
+    "column": "mn_sat",
+    "coverage": 37.4,
+    "non_null": 3133,
+    "null_count": 5245,
+    "dtype": "object",
+    "unique_count": 68,
+    "sample_values": [
+      "1,070.00",
+      "1,070.00",
+      "1,070.00"
+    ]
+  },
+  {
+    "column": "tuition",
+    "coverage": 42.8,
+    "non_null": 3583,
+    "null_count": 4795,
+    "dtype": "object",
+    "unique_count": 115,
+    "sample_values": [
+      "12,696.00",
+      "12,696.00",
+      "12,696.00"
+    ]
+  },
+  {
+    "column": "race",
+    "coverage": 99.2,
+    "non_null": 8315,
+    "null_count": 63,
+    "dtype": "float64",
+    "unique_count": 5,
+    "sample_values": [
+      "4.0",
+      "4.0",
+      "4.0"
+    ]
+  },
+  {
+    "column": "imprace",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "2.0"
+    ]
+  },
+  {
+    "column": "imprelig",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "4.0",
+      "4.0",
+      "4.0"
+    ]
+  },
+  {
+    "column": "from",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "object",
+    "unique_count": 269,
+    "sample_values": [
+      "Chicago",
+      "Chicago",
+      "Chicago"
+    ]
+  },
+  {
+    "column": "zipcode",
+    "coverage": 87.3,
+    "non_null": 7314,
+    "null_count": 1064,
+    "dtype": "object",
+    "unique_count": 409,
+    "sample_values": [
+      "60,521",
+      "60,521",
+      "60,521"
+    ]
+  },
+  {
+    "column": "income",
+    "coverage": 51.1,
+    "non_null": 4279,
+    "null_count": 4099,
+    "dtype": "object",
+    "unique_count": 261,
+    "sample_values": [
+      "69,487.00",
+      "69,487.00",
+      "69,487.00"
+    ]
+  },
+  {
+    "column": "goal",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 6,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "2.0"
+    ]
+  },
+  {
+    "column": "date",
+    "coverage": 98.8,
+    "non_null": 8281,
+    "null_count": 97,
+    "dtype": "float64",
+    "unique_count": 7,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "go_out",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 7,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "career",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "object",
+    "unique_count": 367,
+    "sample_values": [
+      "lawyer",
+      "lawyer",
+      "lawyer"
+    ]
+  },
+  {
+    "column": "career_c",
+    "coverage": 98.4,
+    "non_null": 8240,
+    "null_count": 138,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "sports",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "tvsports",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "2.0"
+    ]
+  },
+  {
+    "column": "exercise",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "dining",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "museums",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "art",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "hiking",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "gaming",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 12,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "clubbing",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "reading",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "tv",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "theater",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "movies",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "concerts",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "music",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "shopping",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "yoga",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "exphappy",
+    "coverage": 98.8,
+    "non_null": 8277,
+    "null_count": 101,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "3.0",
+      "3.0",
+      "3.0"
+    ]
+  },
+  {
+    "column": "expnum",
+    "coverage": 21.5,
+    "non_null": 1800,
+    "null_count": 6578,
+    "dtype": "float64",
+    "unique_count": 18,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "2.0"
+    ]
+  },
+  {
+    "column": "attr1_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 94,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "sinc1_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 78,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "intel1_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 65,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "fun1_1",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "float64",
+    "unique_count": 71,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "amb1_1",
+    "coverage": 98.8,
+    "non_null": 8279,
+    "null_count": 99,
+    "dtype": "float64",
+    "unique_count": 82,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "shar1_1",
+    "coverage": 98.6,
+    "non_null": 8257,
+    "null_count": 121,
+    "dtype": "float64",
+    "unique_count": 85,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "attr4_1",
+    "coverage": 77.5,
+    "non_null": 6489,
+    "null_count": 1889,
+    "dtype": "float64",
+    "unique_count": 33,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "sinc4_1",
+    "coverage": 77.5,
+    "non_null": 6489,
+    "null_count": 1889,
+    "dtype": "float64",
+    "unique_count": 24,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "intel4_1",
+    "coverage": 77.5,
+    "non_null": 6489,
+    "null_count": 1889,
+    "dtype": "float64",
+    "unique_count": 24,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "fun4_1",
+    "coverage": 77.5,
+    "non_null": 6489,
+    "null_count": 1889,
+    "dtype": "float64",
+    "unique_count": 22,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb4_1",
+    "coverage": 77.5,
+    "non_null": 6489,
+    "null_count": 1889,
+    "dtype": "float64",
+    "unique_count": 25,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "shar4_1",
+    "coverage": 77.2,
+    "non_null": 6467,
+    "null_count": 1911,
+    "dtype": "float64",
+    "unique_count": 25,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "attr2_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 87,
+    "sample_values": [
+      "35.0",
+      "35.0",
+      "35.0"
+    ]
+  },
+  {
+    "column": "sinc2_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 80,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "intel2_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 78,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "fun2_1",
+    "coverage": 99.1,
+    "non_null": 8299,
+    "null_count": 79,
+    "dtype": "float64",
+    "unique_count": 74,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "amb2_1",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "float64",
+    "unique_count": 77,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "shar2_1",
+    "coverage": 98.9,
+    "non_null": 8289,
+    "null_count": 89,
+    "dtype": "float64",
+    "unique_count": 73,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "attr3_1",
+    "coverage": 98.7,
+    "non_null": 8273,
+    "null_count": 105,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "sinc3_1",
+    "coverage": 98.7,
+    "non_null": 8273,
+    "null_count": 105,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "fun3_1",
+    "coverage": 98.7,
+    "non_null": 8273,
+    "null_count": 105,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "intel3_1",
+    "coverage": 98.7,
+    "non_null": 8273,
+    "null_count": 105,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "amb3_1",
+    "coverage": 98.7,
+    "non_null": 8273,
+    "null_count": 105,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "attr5_1",
+    "coverage": 58.6,
+    "non_null": 4906,
+    "null_count": 3472,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "sinc5_1",
+    "coverage": 58.6,
+    "non_null": 4906,
+    "null_count": 3472,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "intel5_1",
+    "coverage": 58.6,
+    "non_null": 4906,
+    "null_count": 3472,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "fun5_1",
+    "coverage": 58.6,
+    "non_null": 4906,
+    "null_count": 3472,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "amb5_1",
+    "coverage": 58.6,
+    "non_null": 4906,
+    "null_count": 3472,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "dec",
+    "coverage": 100.0,
+    "non_null": 8378,
+    "null_count": 0,
+    "dtype": "int64",
+    "unique_count": 2,
+    "sample_values": [
+      "1",
+      "1",
+      "1"
+    ]
+  },
+  {
+    "column": "attr",
+    "coverage": 97.6,
+    "non_null": 8176,
+    "null_count": 202,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "6.0",
+      "7.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "sinc",
+    "coverage": 96.7,
+    "non_null": 8101,
+    "null_count": 277,
+    "dtype": "float64",
+    "unique_count": 14,
+    "sample_values": [
+      "9.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "intel",
+    "coverage": 96.5,
+    "non_null": 8082,
+    "null_count": 296,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "fun",
+    "coverage": 95.8,
+    "non_null": 8028,
+    "null_count": 350,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "7.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "amb",
+    "coverage": 91.5,
+    "non_null": 7666,
+    "null_count": 712,
+    "dtype": "float64",
+    "unique_count": 15,
+    "sample_values": [
+      "6.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "shar",
+    "coverage": 87.3,
+    "non_null": 7311,
+    "null_count": 1067,
+    "dtype": "float64",
+    "unique_count": 15,
+    "sample_values": [
+      "5.0",
+      "6.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "like",
+    "coverage": 97.1,
+    "non_null": 8138,
+    "null_count": 240,
+    "dtype": "float64",
+    "unique_count": 18,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "prob",
+    "coverage": 96.3,
+    "non_null": 8069,
+    "null_count": 309,
+    "dtype": "float64",
+    "unique_count": 19,
+    "sample_values": [
+      "6.0",
+      "5.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "met",
+    "coverage": 95.5,
+    "non_null": 8003,
+    "null_count": 375,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "2.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "match_es",
+    "coverage": 86.0,
+    "non_null": 7205,
+    "null_count": 1173,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "4.0",
+      "4.0",
+      "4.0"
+    ]
+  },
+  {
+    "column": "attr1_s",
+    "coverage": 48.9,
+    "non_null": 4096,
+    "null_count": 4282,
+    "dtype": "float64",
+    "unique_count": 73,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "sinc1_s",
+    "coverage": 48.9,
+    "non_null": 4096,
+    "null_count": 4282,
+    "dtype": "float64",
+    "unique_count": 67,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "intel1_s",
+    "coverage": 48.9,
+    "non_null": 4096,
+    "null_count": 4282,
+    "dtype": "float64",
+    "unique_count": 64,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "fun1_s",
+    "coverage": 48.9,
+    "non_null": 4096,
+    "null_count": 4282,
+    "dtype": "float64",
+    "unique_count": 64,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "amb1_s",
+    "coverage": 48.9,
+    "non_null": 4096,
+    "null_count": 4282,
+    "dtype": "float64",
+    "unique_count": 76,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "shar1_s",
+    "coverage": 48.9,
+    "non_null": 4096,
+    "null_count": 4282,
+    "dtype": "float64",
+    "unique_count": 76,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "attr3_s",
+    "coverage": 47.7,
+    "non_null": 4000,
+    "null_count": 4378,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "sinc3_s",
+    "coverage": 47.7,
+    "non_null": 4000,
+    "null_count": 4378,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "intel3_s",
+    "coverage": 47.7,
+    "non_null": 4000,
+    "null_count": 4378,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "fun3_s",
+    "coverage": 47.7,
+    "non_null": 4000,
+    "null_count": 4378,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "amb3_s",
+    "coverage": 47.7,
+    "non_null": 4000,
+    "null_count": 4378,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "satis_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "length",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 3,
+    "sample_values": [
+      "2.0",
+      "2.0",
+      "2.0"
+    ]
+  },
+  {
+    "column": "numdat_2",
+    "coverage": 88.7,
+    "non_null": 7433,
+    "null_count": 945,
+    "dtype": "float64",
+    "unique_count": 3,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "attr7_2",
+    "coverage": 23.7,
+    "non_null": 1984,
+    "null_count": 6394,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "40.0",
+      "40.0",
+      "40.0"
+    ]
+  },
+  {
+    "column": "sinc7_2",
+    "coverage": 23.3,
+    "non_null": 1955,
+    "null_count": 6423,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "intel7_2",
+    "coverage": 23.7,
+    "non_null": 1984,
+    "null_count": 6394,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "fun7_2",
+    "coverage": 23.7,
+    "non_null": 1984,
+    "null_count": 6394,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "amb7_2",
+    "coverage": 23.3,
+    "non_null": 1955,
+    "null_count": 6423,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "shar7_2",
+    "coverage": 23.6,
+    "non_null": 1974,
+    "null_count": 6404,
+    "dtype": "float64",
+    "unique_count": 14,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "attr1_2",
+    "coverage": 88.9,
+    "non_null": 7445,
+    "null_count": 933,
+    "dtype": "float64",
+    "unique_count": 77,
+    "sample_values": [
+      "19.44",
+      "19.44",
+      "19.44"
+    ]
+  },
+  {
+    "column": "sinc1_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 71,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "intel1_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 67,
+    "sample_values": [
+      "13.89",
+      "13.89",
+      "13.89"
+    ]
+  },
+  {
+    "column": "fun1_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 74,
+    "sample_values": [
+      "22.22",
+      "22.22",
+      "22.22"
+    ]
+  },
+  {
+    "column": "amb1_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 73,
+    "sample_values": [
+      "11.11",
+      "11.11",
+      "11.11"
+    ]
+  },
+  {
+    "column": "shar1_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 82,
+    "sample_values": [
+      "16.67",
+      "16.67",
+      "16.67"
+    ]
+  },
+  {
+    "column": "attr4_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 27,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "sinc4_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 22,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "intel4_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 25,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "fun4_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 22,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb4_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 24,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "shar4_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 22,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "attr2_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 81,
+    "sample_values": [
+      "18.87",
+      "18.87",
+      "18.87"
+    ]
+  },
+  {
+    "column": "sinc2_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 67,
+    "sample_values": [
+      "15.09",
+      "15.09",
+      "15.09"
+    ]
+  },
+  {
+    "column": "intel2_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 69,
+    "sample_values": [
+      "13.21",
+      "13.21",
+      "13.21"
+    ]
+  },
+  {
+    "column": "fun2_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 61,
+    "sample_values": [
+      "18.87",
+      "18.87",
+      "18.87"
+    ]
+  },
+  {
+    "column": "amb2_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 76,
+    "sample_values": [
+      "15.09",
+      "15.09",
+      "15.09"
+    ]
+  },
+  {
+    "column": "shar2_2",
+    "coverage": 68.9,
+    "non_null": 5775,
+    "null_count": 2603,
+    "dtype": "float64",
+    "unique_count": 64,
+    "sample_values": [
+      "18.87",
+      "18.87",
+      "18.87"
+    ]
+  },
+  {
+    "column": "attr3_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "sinc3_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "intel3_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 7,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "fun3_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb3_2",
+    "coverage": 89.1,
+    "non_null": 7463,
+    "null_count": 915,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "attr5_2",
+    "coverage": 52.2,
+    "non_null": 4377,
+    "null_count": 4001,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "sinc5_2",
+    "coverage": 52.2,
+    "non_null": 4377,
+    "null_count": 4001,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "intel5_2",
+    "coverage": 52.2,
+    "non_null": 4377,
+    "null_count": 4001,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "fun5_2",
+    "coverage": 52.2,
+    "non_null": 4377,
+    "null_count": 4001,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb5_2",
+    "coverage": 52.2,
+    "non_null": 4377,
+    "null_count": 4001,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "you_call",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "them_cal",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 8,
+    "sample_values": [
+      "1.0",
+      "1.0",
+      "1.0"
+    ]
+  },
+  {
+    "column": "date_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 2,
+    "sample_values": [
+      "0.0",
+      "0.0",
+      "0.0"
+    ]
+  },
+  {
+    "column": "numdat_3",
+    "coverage": 17.9,
+    "non_null": 1496,
+    "null_count": 6882,
+    "dtype": "float64",
+    "unique_count": 6,
+    "sample_values": [
+      "0.0",
+      "0.0",
+      "0.0"
+    ]
+  },
+  {
+    "column": "num_in_3",
+    "coverage": 8.0,
+    "non_null": 668,
+    "null_count": 7710,
+    "dtype": "float64",
+    "unique_count": 4,
+    "sample_values": [
+      "0.0",
+      "0.0",
+      "0.0"
+    ]
+  },
+  {
+    "column": "attr1_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 56,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "sinc1_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 47,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "intel1_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 44,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "fun1_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 53,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "amb1_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 56,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "shar1_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 53,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "attr7_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 21,
+    "sample_values": [
+      "25.0",
+      "25.0",
+      "25.0"
+    ]
+  },
+  {
+    "column": "sinc7_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 13,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "intel7_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 14,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "fun7_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "20.0",
+      "20.0",
+      "20.0"
+    ]
+  },
+  {
+    "column": "amb7_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 13,
+    "sample_values": [
+      "15.0",
+      "15.0",
+      "15.0"
+    ]
+  },
+  {
+    "column": "shar7_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 15,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "attr4_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 23,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "sinc4_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "intel4_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "fun4_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 15,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb4_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 20,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "shar4_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "attr2_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 23,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "sinc2_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 13,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "intel2_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "fun2_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 16,
+    "sample_values": [
+      "8.0",
+      "8.0",
+      "8.0"
+    ]
+  },
+  {
+    "column": "amb2_3",
+    "coverage": 35.3,
+    "non_null": 2959,
+    "null_count": 5419,
+    "dtype": "float64",
+    "unique_count": 17,
+    "sample_values": [
+      "6.0",
+      "6.0",
+      "6.0"
+    ]
+  },
+  {
+    "column": "shar2_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 12,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "attr3_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "5.0",
+      "5.0",
+      "5.0"
+    ]
+  },
+  {
+    "column": "sinc3_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "intel3_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "fun3_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb3_3",
+    "coverage": 47.4,
+    "non_null": 3974,
+    "null_count": 4404,
+    "dtype": "float64",
+    "unique_count": 11,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "attr5_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "9.0",
+      "9.0",
+      "9.0"
+    ]
+  },
+  {
+    "column": "sinc5_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "intel5_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 7,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  },
+  {
+    "column": "fun5_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 10,
+    "sample_values": [
+      "7.0",
+      "7.0",
+      "7.0"
+    ]
+  },
+  {
+    "column": "amb5_3",
+    "coverage": 24.1,
+    "non_null": 2016,
+    "null_count": 6362,
+    "dtype": "float64",
+    "unique_count": 9,
+    "sample_values": [
+      "10.0",
+      "10.0",
+      "10.0"
+    ]
+  }
+]

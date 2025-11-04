@@ -1,0 +1,19 @@
+{
+  "total_records": 8378,
+  "clean_records": 0,
+  "unique_participants": 0,
+  "total_pairs": 0,
+  "matched_pairs": 0,
+  "unmatched_pairs": 0,
+  "age_distribution": {
+    "count": 0.0,
+    "mean": NaN,
+    "std": NaN,
+    "min": NaN,
+    "25%": NaN,
+    "50%": NaN,
+    "75%": NaN,
+    "max": NaN
+  },
+  "gender_distribution": {}
+}
