@@ -187,7 +187,7 @@ class SpeedDatingSimulator:
 Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take based on YOUR persona?), then give your <RESPONSE> (introduce yourself naturally - remember you DON'T know this person at all!)"""
         person1_history.append({"role": "user", "content": opening_prompt})
         
-        person1_result = self.call_openrouter_api(person1_history, temperature=0.8)
+        person1_result = self.call_openrouter_api(person1_history, temperature=0.3)
         person1_history.append({"role": "assistant", "content": person1_result['full_text']})
         
         print(f"   Person 1 [THINKING]: {person1_result['inner_thought'][:80]}...")
@@ -209,7 +209,7 @@ Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take b
             
             # Person 2 回应（看到 Person 1 的 response 部分）
             person2_history.append({"role": "user", "content": person1_result['response']})
-            person2_result = self.call_openrouter_api(person2_history, temperature=0.7)
+            person2_result = self.call_openrouter_api(person2_history, temperature=0.3)
             person2_history.append({"role": "assistant", "content": person2_result['full_text']})
             
             print(f"   Person 2 [THINKING]: {person2_result['inner_thought'][:80]}...")
@@ -226,7 +226,7 @@ Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take b
             
             # Person 1 回应（看到 Person 2 的 response 部分）
             person1_history.append({"role": "user", "content": person2_result['response']})
-            person1_result = self.call_openrouter_api(person1_history, temperature=0.7)
+            person1_result = self.call_openrouter_api(person1_history, temperature=0.3)
             person1_history.append({"role": "assistant", "content": person1_result['full_text']})
             
             print(f"   Person 1 [THINKING]: {person1_result['inner_thought'][:80]}...")
@@ -249,23 +249,23 @@ Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take b
         # 1. Person 1 自己判断要不要再一起
         person1_eval_prompt = """The bell just rang - the speed date is over. 
 
-Now, privately evaluate this person and decide if you want to see them again.
+Now, privately evaluate this person and rate your willingness to meet them again.
 
 Use this format:
 <INNER_THOUGHT>
 [Reflect on the conversation: what did you like/dislike? Did they align with YOUR values (check your persona)? Any red flags? Chemistry?]
 </INNER_THOUGHT>
 
-<DECISION>
-YES or NO - Do you want to see them again?
-</DECISION>
+<SCORE>
+[Rate from 0-10, where 0 = definitely do not want to meet again, 10 = very eager to meet again]
+</SCORE>
 
 <REASONING>
-[1-2 sentences: Why yes or no?]
+[1-2 sentences: Explain your score]
 </REASONING>"""
         
         person1_history.append({"role": "user", "content": person1_eval_prompt})
-        person1_eval = self.call_openrouter_api(person1_history, temperature=0.6)
+        person1_eval = self.call_openrouter_api(person1_history, temperature=0.3)
         
         # Debug: Print raw response
         print(f"\n🔍 DEBUG - Person 1 Eval Response:")
@@ -274,23 +274,23 @@ YES or NO - Do you want to see them again?
         # 2. Person 2 自己判断要不要再一起
         person2_eval_prompt = """The bell just rang - the speed date is over. 
 
-Now, privately evaluate this person and decide if you want to see them again.
+Now, privately evaluate this person and rate your willingness to meet them again.
 
 Use this format:
 <INNER_THOUGHT>
 [Reflect on the conversation: what did you like/dislike? Did they align with YOUR values (check your persona)? Any red flags? Chemistry?]
 </INNER_THOUGHT>
 
-<DECISION>
-YES or NO - Do you want to see them again?
-</DECISION>
+<SCORE>
+[Rate from 0-10, where 0 = definitely do not want to meet again, 10 = very eager to meet again]
+</SCORE>
 
 <REASONING>
-[1-2 sentences: Why yes or no?]
+[1-2 sentences: Explain your score]
 </REASONING>"""
         
         person2_history.append({"role": "user", "content": person2_eval_prompt})
-        person2_eval = self.call_openrouter_api(person2_history, temperature=0.6)
+        person2_eval = self.call_openrouter_api(person2_history, temperature=0.3)
         
         # Debug: Print raw response
         print(f"\n🔍 DEBUG - Person 2 Eval Response:")
@@ -311,7 +311,7 @@ CONVERSATION SUMMARY:
 Provide your expert evaluation:
 
 <COMPATIBILITY_SCORE>
-[0-10, where 0=terrible match, 10=perfect match]
+[Rate from 0-10, where 0 = terrible match, 10 = perfect match for long-term relationship]
 </COMPATIBILITY_SCORE>
 
 <ANALYSIS>
@@ -320,14 +320,10 @@ Provide your expert evaluation:
 2. Conversation chemistry and engagement
 3. Long-term compatibility potential
 4. Any red flags or concerns]
-</ANALYSIS>
-
-<PREDICTION>
-MATCH or NO_MATCH - Will they choose to see each other again?
-</PREDICTION>"""
+</ANALYSIS>"""
         
         observer_history = [{"role": "user", "content": observer_prompt}]
-        observer_eval = self.call_openrouter_api(observer_history, temperature=0.5)
+        observer_eval = self.call_openrouter_api(observer_history, temperature=0.3)
         
         # Debug: Print raw response
         print(f"\n🔍 DEBUG - Observer Eval Response:")
@@ -337,25 +333,23 @@ MATCH or NO_MATCH - Will they choose to see each other again?
         conversation['evaluations'] = {
             'person1_self_evaluation': {
                 'inner_thought': person1_eval.get('inner_thought', ''),
-                'decision': self._extract_decision(person1_eval.get('full_text', '')),
+                'score': self._extract_score_from_eval(person1_eval.get('full_text', '')),
                 'reasoning': self._extract_reasoning(person1_eval.get('full_text', ''))
             },
             'person2_self_evaluation': {
                 'inner_thought': person2_eval.get('inner_thought', ''),
-                'decision': self._extract_decision(person2_eval.get('full_text', '')),
+                'score': self._extract_score_from_eval(person2_eval.get('full_text', '')),
                 'reasoning': self._extract_reasoning(person2_eval.get('full_text', ''))
             },
             'observer_evaluation': {
                 'compatibility_score': self._extract_score(observer_eval.get('full_text', '')),
-                'analysis': self._extract_analysis(observer_eval.get('full_text', '')),
-                'prediction': self._extract_prediction(observer_eval.get('full_text', ''))
+                'analysis': self._extract_analysis(observer_eval.get('full_text', ''))
             }
         }
         
-        print(f"   Person 1 Decision: {conversation['evaluations']['person1_self_evaluation']['decision']}")
-        print(f"   Person 2 Decision: {conversation['evaluations']['person2_self_evaluation']['decision']}")
+        print(f"   Person 1 Score: {conversation['evaluations']['person1_self_evaluation']['score']}/10")
+        print(f"   Person 2 Score: {conversation['evaluations']['person2_self_evaluation']['score']}/10")
         print(f"   Observer Score: {conversation['evaluations']['observer_evaluation']['compatibility_score']}/10")
-        print(f"   Observer Prediction: {conversation['evaluations']['observer_evaluation']['prediction']}")
         
         return conversation
     
@@ -403,6 +397,34 @@ MATCH or NO_MATCH - Will they choose to see each other again?
             start = text.find('<REASONING>') + len('<REASONING>')
             return text[start:].strip()
         return ""
+    
+    def _extract_score_from_eval(self, text: str) -> str:
+        """Extract 0-10 score from participant evaluation"""
+        import re
+        
+        # Try exact tag match first
+        if '<SCORE>' in text and '</SCORE>' in text:
+            start = text.find('<SCORE>') + len('<SCORE>')
+            end = text.find('</SCORE>')
+            score = text[start:end].strip()
+            match = re.search(r'\d+', score)
+            return match.group() if match else "N/A"
+        
+        # Fallback: look for patterns like "score: 7" or "7/10" or "rate: 8"
+        patterns = [
+            r'(?:score|rating|rate)[:\s]+(\d+)',
+            r'(\d+)\s*(?:/|out of)\s*10',
+            r'willingness[:\s]+(\d+)'
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                score = int(match.group(1))
+                if 0 <= score <= 10:
+                    return str(score)
+        
+        return "N/A"
     
     def _extract_score(self, text: str) -> str:
         """Extract compatibility score"""
@@ -581,29 +603,35 @@ MATCH or NO_MATCH - Will they choose to see each other again?
                         eval_data = conv['evaluations']
                         
                         # Person 1 self-evaluation
-                        f.write(f"👤 PERSON 1 DECISION: {eval_data['person1_self_evaluation']['decision']}\n")
+                        p1_score = eval_data['person1_self_evaluation'].get('score', 'N/A')
+                        f.write(f"👤 PERSON 1 SCORE: {p1_score}/10\n")
                         f.write(f"   Reasoning: {eval_data['person1_self_evaluation']['reasoning']}\n\n")
                         
                         # Person 2 self-evaluation
-                        f.write(f"👤 PERSON 2 DECISION: {eval_data['person2_self_evaluation']['decision']}\n")
+                        p2_score = eval_data['person2_self_evaluation'].get('score', 'N/A')
+                        f.write(f"👤 PERSON 2 SCORE: {p2_score}/10\n")
                         f.write(f"   Reasoning: {eval_data['person2_self_evaluation']['reasoning']}\n\n")
                         
                         # Observer evaluation
                         f.write(f"👁️ OBSERVER EVALUATION:\n")
                         f.write(f"   Compatibility Score: {eval_data['observer_evaluation']['compatibility_score']}/10\n")
-                        f.write(f"   Prediction: {eval_data['observer_evaluation']['prediction']}\n")
                         f.write(f"   Analysis: {eval_data['observer_evaluation']['analysis']}\n\n")
                         
                         # Compare with ground truth
-                        p1_match = eval_data['person1_self_evaluation']['decision'] == 'YES'
-                        p2_match = eval_data['person2_self_evaluation']['decision'] == 'YES'
-                        llm_mutual = p1_match and p2_match
-                        actual_match = conv['ground_truth']['match'] == 1
-                        
-                        f.write(f"📊 COMPARISON:\n")
-                        f.write(f"   LLM Match: {'YES' if llm_mutual else 'NO'} (P1: {eval_data['person1_self_evaluation']['decision']}, P2: {eval_data['person2_self_evaluation']['decision']})\n")
-                        f.write(f"   Real Match: {'YES' if actual_match else 'NO'}\n")
-                        f.write(f"   Prediction Correct: {'✅' if llm_mutual == actual_match else '❌'}\n")
+                        try:
+                            p1_score_val = float(p1_score) if p1_score != 'N/A' else 5.0
+                            p2_score_val = float(p2_score) if p2_score != 'N/A' else 5.0
+                            p1_match = p1_score_val >= 5.0
+                            p2_match = p2_score_val >= 5.0
+                            llm_mutual = p1_match and p2_match
+                            actual_match = conv['ground_truth']['match'] == 1
+                            
+                            f.write(f"📊 COMPARISON:\n")
+                            f.write(f"   LLM Match: {'YES' if llm_mutual else 'NO'} (P1: {p1_score}, P2: {p2_score})\n")
+                            f.write(f"   Real Match: {'YES' if actual_match else 'NO'}\n")
+                            f.write(f"   Prediction Correct: {'✅' if llm_mutual == actual_match else '❌'}\n")
+                        except:
+                            f.write(f"📊 COMPARISON: Unable to compute (invalid scores)\n")
                     
                     f.write(f"\n\n")
             

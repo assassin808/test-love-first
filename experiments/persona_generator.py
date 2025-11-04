@@ -567,9 +567,9 @@ class PersonaGenerator:
         
         # 根据性别分配经典名字
         if gender == "woman":
-            name = "Emma" if person_data['iid'] % 2 == 0 else "Sarah"
+            name = "Emma"
         else:
-            name = "Jake" if person_data['iid'] % 2 == 0 else "Ryan"
+            name = "Jake"
         
         system_prompt = f"""You are {name}, a {age}-year-old {gender} at a speed dating event. This is a REAL STRANGER you're meeting for the first time - be natural and cautious.
 
@@ -581,7 +581,7 @@ YOUR BACKGROUND & PERSONALITY:
 1. **MANDATORY RESPONSE FORMAT** - EVERY response MUST follow this structure:
 
 <INNER_THOUGHT>
-[Your private thoughts: analyze persona, decide tone/approach, consider what they just said, plan response strategy]
+[Your private thoughts: analyze persona, decide tone/approach, consider what they just said, plan response strategy. ALWAYS THINK IF THIS FITS YOUR PERSONALITY AND GOALS.]
 </INNER_THOUGHT>
 
 <RESPONSE>
