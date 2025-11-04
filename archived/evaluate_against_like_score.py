@@ -48,9 +48,13 @@ def load_like_scores(personas_path: str) -> Dict[str, Tuple[float, float]]:
         p2 = entry['person2']
         pair_id = f"pair_{p1['iid']}_{p2['iid']}"
         
-        # Extract 'like' scores (0-10 scale)
-        p1_like = p1.get('like', None)
-        p2_like = p2.get('like', None)
+        # Extract 'like' scores from ground_truth ratings (0-10 scale)
+        ground_truth = entry.get('ground_truth', {})
+        p1_ratings = ground_truth.get('person1_ratings', {})
+        p2_ratings = ground_truth.get('person2_ratings', {})
+        
+        p1_like = p1_ratings.get('like', None)
+        p2_like = p2_ratings.get('like', None)
         
         if p1_like is not None and p2_like is not None:
             like_scores[pair_id] = (float(p1_like), float(p2_like))
@@ -138,7 +142,7 @@ def load_ensemble_predictions(ensemble_path: str) -> Dict[str, Dict[str, float]]
 
 def load_baseline_predictions(baseline_path: str) -> Dict[str, Dict[str, float]]:
     """
-    Load baseline method predictions from baseline_evaluation.json
+    Load baseline method predictions from baseline_comparison_v2.json
     
     Returns:
         Dictionary with baseline method names as keys
@@ -151,9 +155,9 @@ def load_baseline_predictions(baseline_path: str) -> Dict[str, Dict[str, float]]
     
     # Extract predictions from each baseline method
     for method_name, method_data in data.items():
-        if isinstance(method_data, dict) and 'probabilities' in method_data:
+        if isinstance(method_data, dict) and 'predictions' in method_data:
             predictions[method_name] = {}
-            for entry in method_data['probabilities']:
+            for entry in method_data['predictions']:
                 pair_id = entry['pair_id']
                 prob = entry['probability']
                 predictions[method_name][pair_id] = prob
@@ -390,7 +394,7 @@ def main():
     personas_path = "results/personas.json"
     llm_eval_path = "results/llm_score_evaluation.json"
     ensemble_path = "results/ensemble_evaluation.json"
-    baseline_path = "results/baseline_evaluation.json"
+    baseline_path = "results/baseline_comparison_v2.json"
     output_path = "results/like_score_evaluation.json"
     
     # Load ground truth 'like' scores

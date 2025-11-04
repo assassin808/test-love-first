@@ -734,8 +734,14 @@ def evaluate_baselines_v2(
         time2_p1 = pair['person1'].get('time2_reflection', {})
         time2_p2 = pair['person2'].get('time2_reflection', {})
         
+        # Store iids for creating IID-based pair_id
+        iid1 = pair['person1']['iid']
+        iid2 = pair['person2']['iid']
+        
         test_pairs.append({
             'pair_id': pair.get('pair_id'),
+            'iid1': iid1,
+            'iid2': iid2,
             'person1_data': person1_data,
             'person2_data': person2_data,
             'person1_data_full': {**person1_data, **flatten_time2(time2_p1)},
@@ -906,6 +912,17 @@ def evaluate_baselines_v2(
     # Use threshold tuned on TRAINING data (no data leakage)
     predictions_sim_v1 = similarities_v1 >= best_threshold_v1
     
+    # Save predictions for each pair (use IID-based pair_id to match LLM results)
+    pair_predictions_sim_v1 = []
+    for i, pair in enumerate(test_pairs):
+        pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+        pair_predictions_sim_v1.append({
+            'pair_id': pair_id,
+            'probability': float(similarities_v1[i]),
+            'prediction': bool(predictions_sim_v1[i]),
+            'ground_truth': bool(pair['match'])
+        })
+    
     results['similarity_v1'] = {
         'model': 'Similarity V1 (Time 1 only)',
         'feature_mode': 'v1',
@@ -916,7 +933,8 @@ def evaluate_baselines_v2(
         'f1': f1_score(y_true, predictions_sim_v1, zero_division=0),
         'auc': roc_auc_score(y_true, similarities_v1),
         'pr_auc': average_precision_score(y_true, similarities_v1),
-        'confusion_matrix': confusion_matrix(y_true, predictions_sim_v1).tolist()
+        'confusion_matrix': confusion_matrix(y_true, predictions_sim_v1).tolist(),
+        'predictions': pair_predictions_sim_v1
     }
     
     print(f"  Threshold (tuned on training): {best_threshold_v1:.3f}")
@@ -1100,6 +1118,17 @@ def evaluate_baselines_v2(
     # Use threshold tuned on TRAINING data (no data leakage)
     predictions_sim_v2 = similarities_v2 >= best_threshold_v2
     
+    # Save predictions for each pair (use IID-based pair_id to match LLM results)
+    pair_predictions_sim_v2 = []
+    for i, pair in enumerate(test_pairs):
+        pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+        pair_predictions_sim_v2.append({
+            'pair_id': pair_id,
+            'probability': float(similarities_v2[i]),
+            'prediction': bool(predictions_sim_v2[i]),
+            'ground_truth': bool(pair['match'])
+        })
+    
     results['similarity_v2'] = {
         'model': 'Similarity V2 (Time 1 + Time 2)',
         'feature_mode': 'v2',
@@ -1110,7 +1139,8 @@ def evaluate_baselines_v2(
         'f1': f1_score(y_true, predictions_sim_v2, zero_division=0),
         'auc': roc_auc_score(y_true, similarities_v2),
         'pr_auc': average_precision_score(y_true, similarities_v2),
-        'confusion_matrix': confusion_matrix(y_true, predictions_sim_v2).tolist()
+        'confusion_matrix': confusion_matrix(y_true, predictions_sim_v2).tolist(),
+        'predictions': pair_predictions_sim_v2
     }
     
     print(f"  Threshold (tuned on training): {best_threshold_v2:.3f}")
@@ -1251,6 +1281,17 @@ def evaluate_baselines_v2(
             print(f"  Best strategy: {best_strategy}, threshold: {best_threshold:.3f} (F1={best_f1:.3f})")
             predictions_v1 = [p >= best_threshold for p in probs_v1]
         
+        # Save predictions for each pair (use IID-based pair_id to match LLM results)
+        pair_predictions_v1 = []
+        for i, pair in enumerate(test_pairs):
+            pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+            pair_predictions_v1.append({
+                'pair_id': pair_id,
+                'probability': float(probs_v1[i]),
+                'prediction': bool(predictions_v1[i]),
+                'ground_truth': bool(pair['match'])
+            })
+        
         results[f'{model_type}_v1'] = {
             'model': f'{model_type} V1 (Time 1 only)',
             'feature_mode': 'v1',
@@ -1260,7 +1301,8 @@ def evaluate_baselines_v2(
             'f1': f1_score(y_true, predictions_v1, zero_division=0),
             'auc': roc_auc_score(y_true, probs_v1),
             'pr_auc': average_precision_score(y_true, probs_v1),
-            'confusion_matrix': confusion_matrix(y_true, predictions_v1).tolist()
+            'confusion_matrix': confusion_matrix(y_true, predictions_v1).tolist(),
+            'predictions': pair_predictions_v1
         }
         
         print(f"  Accuracy:  {results[f'{model_type}_v1']['accuracy']:.3f}")
@@ -1384,6 +1426,17 @@ def evaluate_baselines_v2(
             print(f"  Best strategy: {best_strategy}, threshold: {best_threshold:.3f} (F1={best_f1:.3f})")
             predictions_v2 = [p >= best_threshold for p in probs_v2]
         
+        # Save predictions for each pair (use IID-based pair_id to match LLM results)
+        pair_predictions_v2 = []
+        for i, pair in enumerate(test_pairs):
+            pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+            pair_predictions_v2.append({
+                'pair_id': pair_id,
+                'probability': float(probs_v2[i]),
+                'prediction': bool(predictions_v2[i]),
+                'ground_truth': bool(pair['match'])
+            })
+        
         results[f'{model_type}_v2'] = {
             'model': f'{model_type} V2 (Time 1 + Time 2)',
             'feature_mode': 'v2',
@@ -1393,7 +1446,8 @@ def evaluate_baselines_v2(
             'f1': f1_score(y_true, predictions_v2, zero_division=0),
             'auc': roc_auc_score(y_true, probs_v2),
             'pr_auc': average_precision_score(y_true, probs_v2),
-            'confusion_matrix': confusion_matrix(y_true, predictions_v2).tolist()
+            'confusion_matrix': confusion_matrix(y_true, predictions_v2).tolist(),
+            'predictions': pair_predictions_v2
         }
         
         print(f"  Accuracy:  {results[f'{model_type}_v2']['accuracy']:.3f}")
