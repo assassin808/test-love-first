@@ -38,85 +38,133 @@ class SpeedDatingDataProcessor:
     
     def filter_quality_samples(self):
         """
-        过滤高质量样本（中高覆盖率版本 >50%）
+        过滤高质量样本（Time 1 + Time 2 完整版）
         
-        使用所有中等和高覆盖率字段（>50%），最大化数据完整性
+        包含:
+        ✅ Time 1: 所有字段（除了 expnum, mn_sat, tuition）
+        ✅ Time 2: 所有字段（除了 retrospective weights attr7_2 系列）
+        ❌ 排除: expnum (21.5%), mn_sat (37%), tuition (43%), attr7_2 series (23%)
         
-        必需字段分组:
-        1. 核心信息: demographics, background, dating behavior
-        2. Time 1 完整数据: preferences (self/opposite/same), self-ratings, others' perception
-        3. 兴趣爱好: 至少12个有效值 (70%)
-        4. Scorecard: 完整评分
-        5. Ground truth: 决策和匹配结果
+        字段分组:
+        1. 核心信息 (Time 1): demographics, background, dating behavior, expectations
+        2. 择偶偏好 (Time 1): self/opposite/same sex preferences
+        3. 自我认知 (Time 1): self-ratings, others' perception
+        4. 兴趣爱好 (Time 1): 17 activities (≥12 valid)
+        5. Scorecard: 约会评分
+        6. Time 2: satisfaction, updated preferences/ratings
+        7. Ground truth: dec, match
         """
-        print("\n🔍 Filtering quality samples (Medium-High coverage >50%)...")
-        print("=" * 70)
+        print("\n🔍 Filtering quality samples (Time 1 + Time 2 Complete)...")
+        print("=" * 80)
         
         df = self.df.copy()
         initial_count = len(df)
         
-        # 1. 核心人口统计学（98-100% coverage）
+        print("\n📅 TIME 1 Fields:")
+        print("-" * 80)
+        
+        # 1. 核心人口统计学
         demographics = ['age', 'gender', 'field_cd', 'career_c', 'race']
         df = df.dropna(subset=demographics)
-        print(f"   ✅ Demographics (5 fields): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        print(f"   ✅ Demographics: {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 2. 背景态度（98-99% coverage）
+        # 2. 背景态度
         background = ['imprace', 'imprelig', 'goal', 'date', 'go_out']
         df = df.dropna(subset=background)
         print(f"   ✅ Background & behavior: {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 3. 期望（只要 exphappy，不要 expnum 因为只有21.5%）
+        # 3. 期望（只要 exphappy，排除 expnum）
         df = df.dropna(subset=['exphappy'])
-        print(f"   ✅ Expectations (exphappy): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        print(f"   ✅ Expectations (exphappy only): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 4. 自我择偶偏好（99% coverage）
+        # 4. 自我择偶偏好
         preferences_self = ['attr1_1', 'sinc1_1', 'intel1_1', 'fun1_1', 'amb1_1', 'shar1_1']
         df = df.dropna(subset=preferences_self)
         print(f"   ✅ Preferences (self): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 5. 对异性择偶观的预测（99% coverage）
+        # 5. 对异性择偶观的预测
         preferences_opposite = ['attr2_1', 'sinc2_1', 'intel2_1', 'fun2_1', 'amb2_1', 'shar2_1']
         df = df.dropna(subset=preferences_opposite)
         print(f"   ✅ Preferences (opposite sex): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 6. 对同性择偶观的预测（77% coverage - 中等）
+        # 6. 对同性择偶观的预测
         preferences_same = ['attr4_1', 'sinc4_1', 'intel4_1', 'fun4_1', 'amb4_1', 'shar4_1']
         df = df.dropna(subset=preferences_same)
         print(f"   ⚠️  Preferences (same sex): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 7. 自我评价（99% coverage）
+        # 7. 自我评价
         self_ratings = ['attr3_1', 'sinc3_1', 'intel3_1', 'fun3_1', 'amb3_1']
         df = df.dropna(subset=self_ratings)
         print(f"   ✅ Self-ratings: {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 8. 他人眼中的自己（58.6% coverage - 中等）
+        # 8. 他人眼中的自己
         others_perception = ['attr5_1', 'sinc5_1', 'intel5_1', 'fun5_1', 'amb5_1']
         df = df.dropna(subset=others_perception)
         print(f"   ⚠️  Others' perception: {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 9. 兴趣爱好至少12个有效值（降低到70%，更宽松）
+        # 9. 兴趣爱好至少12个有效值
         interests = ['sports', 'tvsports', 'exercise', 'dining', 'museums', 'art',
                     'hiking', 'gaming', 'clubbing', 'reading', 'tv', 'theater',
                     'movies', 'concerts', 'music', 'shopping', 'yoga']
         df['valid_interests'] = df[interests].notna().sum(axis=1)
-        df = df[df['valid_interests'] >= 12]  # 12/17 = 70%
+        df = df[df['valid_interests'] >= 12]
         print(f"   ✅ Interests (≥12/17): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 10. Scorecard 完整（包括 shar，87% coverage 是瓶颈）
+        print("\n⭐ SCORECARD Fields:")
+        print("-" * 80)
+        
+        # 10. Scorecard 完整
         scorecard = ['attr', 'sinc', 'intel', 'fun', 'amb', 'shar', 'like']
         df = df.dropna(subset=scorecard)
         print(f"   ⚠️  Scorecard (7 fields): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        # 11. 必须有决策和匹配结果（100% coverage）
+        # 11. Ground truth
         df = df.dropna(subset=['dec', 'match'])
-        print(f"   ✅ Ground truth: {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        print(f"   ✅ Ground truth (dec, match): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
         
-        print("=" * 70)
+        print("\n📅 TIME 2 Fields (Day After Event):")
+        print("-" * 80)
+        
+        # 12. 满意度评价
+        satisfaction = ['satis_2', 'length', 'numdat_2']
+        df = df.dropna(subset=satisfaction)
+        print(f"   ✅ Satisfaction (3 fields): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        
+        # 13. Time 2 更新的自我偏好
+        preferences_self_t2 = ['attr1_2', 'sinc1_2', 'intel1_2', 'fun1_2', 'amb1_2', 'shar1_2']
+        df = df.dropna(subset=preferences_self_t2)
+        print(f"   ✅ Preferences (self, updated): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        
+        # 14. Time 2 更新的同性偏好
+        preferences_same_t2 = ['attr4_2', 'sinc4_2', 'intel4_2', 'fun4_2', 'amb4_2', 'shar4_2']
+        df = df.dropna(subset=preferences_same_t2)
+        print(f"   ⚠️  Preferences (same sex, updated): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        
+        # 15. Time 2 更新的异性偏好
+        preferences_opposite_t2 = ['attr2_2', 'sinc2_2', 'intel2_2', 'fun2_2', 'amb2_2', 'shar2_2']
+        df = df.dropna(subset=preferences_opposite_t2)
+        print(f"   ⚠️  Preferences (opposite sex, updated): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        
+        # 16. Time 2 更新的自我评价
+        self_ratings_t2 = ['attr3_2', 'sinc3_2', 'intel3_2', 'fun3_2', 'amb3_2']
+        df = df.dropna(subset=self_ratings_t2)
+        print(f"   ✅ Self-ratings (updated): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        
+        # 17. Time 2 更新的他人认知
+        others_perception_t2 = ['attr5_2', 'sinc5_2', 'intel5_2', 'fun5_2', 'amb5_2']
+        df = df.dropna(subset=others_perception_t2)
+        print(f"   ⚠️  Others' perception (updated): {len(df):,} / {initial_count:,} ({len(df)/initial_count*100:.1f}%)")
+        
+        print("\n" + "=" * 80)
         
         self.clean_df = df
         print(f"\n🎉 Final clean dataset: {len(df):,} records ({len(df)/initial_count*100:.1f}%)")
         print(f"   Unique participants: {df['iid'].nunique()}")
-        print(f"   Average features per person: {len(df.columns)} columns")
+        print(f"   Total features: {len(df.columns)} columns")
+        print(f"\n📊 Included:")
+        print(f"   ✅ Time 1: All fields (except expnum, mn_sat, tuition)")
+        print(f"   ✅ Time 2: All fields (except attr7_2 retrospective weights)")
+        print(f"   ❌ Excluded: expnum, mn_sat, tuition, attr7_2 series")
         
         return df
     

@@ -1,19 +1,22 @@
 {
   "total_records": 8378,
-  "clean_records": 0,
-  "unique_participants": 0,
-  "total_pairs": 0,
-  "matched_pairs": 0,
-  "unmatched_pairs": 0,
+  "clean_records": 3587,
+  "unique_participants": 267,
+  "total_pairs": 100,
+  "matched_pairs": 50,
+  "unmatched_pairs": 50,
   "age_distribution": {
-    "count": 0.0,
-    "mean": NaN,
-    "std": NaN,
-    "min": NaN,
-    "25%": NaN,
-    "50%": NaN,
-    "75%": NaN,
-    "max": NaN
+    "count": 3587.0,
+    "mean": 26.580150543629774,
+    "std": 3.4574017820814844,
+    "min": 20.0,
+    "25%": 24.0,
+    "50%": 26.0,
+    "75%": 29.0,
+    "max": 55.0
   },
-  "gender_distribution": {}
+  "gender_distribution": {
+    "1": 1843,
+    "0": 1744
+  }
 }
