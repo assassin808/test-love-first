@@ -18,6 +18,10 @@ from typing import Dict, List, Optional
 import requests
 import time
 from datetime import datetime
+from dotenv import load_dotenv
+
+# 加载 .env 文件
+load_dotenv()
 
 
 class SpeedDatingSimulator:
