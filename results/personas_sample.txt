@@ -1,0 +1,90 @@
+================================================================================
+PAIR 1: pair_001
+Ground Truth: MATCHED
+================================================================================
+
+--- PERSON 1 (iid=467) ---
+
+I'm a 24-year-old woman studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm European/Caucasian-American. 
+
+In my daily life, I go out several times a week, though I only go on dates twice a week. I came to this speed dating event to other reasons. I'm quite optimistic and expect to have a good time tonight. 
+
+When it comes to dating, what I value most is attractiveness, sincerity, intelligence. I think the opposite sex usually looks for attractiveness, intelligence, fun. It's quite important to me that my partner shares my racial/ethnic background. 
+
+I see myself as attractiveness and sincerity. In my free time, I really enjoy exercising/bodybuilding, dining out, visiting museums/galleries, among other things. 
+
+I'm here with an open heart, curious to see who I'll meet and what connections might form.
+
+--- PERSON 2 (iid=492) ---
+
+I'm a 30-year-old man studying Biological Sciences/Chemistry/Physics, with plans to become a Academic/Researcher. I'm Other. 
+
+In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. I'm quite optimistic and expect to have a good time tonight. 
+
+When it comes to dating, what I value most is attractiveness, intelligence, fun. I think the opposite sex usually looks for sincerity, intelligence, ambition. 
+
+I see myself as attractiveness and sincerity. In my free time, I really enjoy playing sports/athletics, watching sports, exercising/bodybuilding, among other things. 
+
+I'm here with an open heart, curious to see who I'll meet and what connections might form.
+
+
+================================================================================
+PAIR 2: pair_001
+Ground Truth: MATCHED
+================================================================================
+
+--- PERSON 1 (iid=263) ---
+
+I'm a 26-year-old woman studying Social Science/Psychology, with plans to become a Undecided. I'm Black/African American. 
+
+In my daily life, I go out twice a week, though I only go on dates several times a year. I came to this speed dating event to have a fun night out. I'm not sure what to expect, but I'm keeping an open mind. 
+
+When it comes to dating, what I value most is attractiveness, sincerity, intelligence. I think the opposite sex usually looks for attractiveness, sincerity, intelligence. It's quite important to me that my partner shares my racial/ethnic background. Religious compatibility is also important to me. 
+
+I see myself as attractiveness and sincerity. In my free time, I really enjoy reading, shopping, music, among other things. 
+
+I'm here with an open heart, curious to see who I'll meet and what connections might form.
+
+--- PERSON 2 (iid=274) ---
+
+I'm a 24-year-old man studying Social Science/Psychology, with plans to become a Academic/Researcher. I'm Latino/Hispanic American. 
+
+In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to get a date. 
+
+When it comes to dating, what I value most is attractiveness, intelligence, fun. I think the opposite sex usually looks for intelligence, fun, ambition. 
+
+I see myself as fun and intelligence. In my free time, I really enjoy reading, music, concerts, among other things. 
+
+I'm open to seeing where things lead. If I meet someone interesting, I'd definitely want to get to know them better.
+
+
+================================================================================
+PAIR 3: pair_001
+Ground Truth: MATCHED
+================================================================================
+
+--- PERSON 1 (iid=241) ---
+
+I'm a 29-year-old woman studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm Asian/Pacific Islander/Asian-American. 
+
+In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. I'm not sure what to expect, but I'm keeping an open mind. 
+
+When it comes to dating, what I value most is attractiveness, sincerity, intelligence. I think the opposite sex usually looks for attractiveness, sincerity, shared interests. 
+
+I see myself as sincerity and attractiveness. In my free time, I really enjoy playing sports/athletics, dining out, visiting museums/galleries, among other things. 
+
+I'm here with an open heart, curious to see who I'll meet and what connections might form.
+
+--- PERSON 2 (iid=248) ---
+
+I'm a 27-year-old man studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm Other. 
+
+In my daily life, I go out several times a week, though I only go on dates twice a month. I came to this speed dating event to have a fun night out. 
+
+When it comes to dating, what I value most is attractiveness, intelligence, fun. I think the opposite sex usually looks for fun, attractiveness, ambition. 
+
+I see myself as intelligence and fun. In my free time, I really enjoy exercising/bodybuilding, hiking/camping, dancing/clubbing, among other things. 
+
+I'm here with an open heart, curious to see who I'll meet and what connections might form.
+
+
