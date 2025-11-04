@@ -258,6 +258,97 @@ class PersonaGenerator:
         perceptions_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_perceptions])
         return f"Updated perception of how others see me: {perceptions_text}."
     
+    def _extract_pre_event_data(self, data: Dict) -> Dict:
+        """
+        提取 Time 1 (Pre-Event) 的所有结构化数据
+        这些数据将用于 ML baseline models，确保与 LLM 看到的信息一致
+        """
+        pre_event_data = {
+            # Demographics
+            'age': data.get('age'),
+            'gender': data.get('gender'),
+            'race': data.get('race'),
+            'field_cd': data.get('field_cd'),
+            'career_c': data.get('career_c'),
+            
+            # Dating behavior
+            'go_out': data.get('go_out'),
+            'date': data.get('date'),
+            'exphappy': data.get('exphappy'),
+            'goal': data.get('goal'),
+            
+            # Values
+            'imprace': data.get('imprace'),
+            'imprelig': data.get('imprelig'),
+            
+            # Preferences (Time 1)
+            'preferences_self': {
+                'attractiveness': data.get('attr1_1'),
+                'sincerity': data.get('sinc1_1'),
+                'intelligence': data.get('intel1_1'),
+                'fun': data.get('fun1_1'),
+                'ambition': data.get('amb1_1'),
+                'shared_interests': data.get('shar1_1')
+            },
+            'preferences_opposite': {
+                'attractiveness': data.get('attr2_1'),
+                'sincerity': data.get('sinc2_1'),
+                'intelligence': data.get('intel2_1'),
+                'fun': data.get('fun2_1'),
+                'ambition': data.get('amb2_1'),
+                'shared_interests': data.get('shar2_1')
+            },
+            'preferences_same': {
+                'attractiveness': data.get('attr4_1'),
+                'sincerity': data.get('sinc4_1'),
+                'intelligence': data.get('intel4_1'),
+                'fun': data.get('fun4_1'),
+                'ambition': data.get('amb4_1'),
+                'shared_interests': data.get('shar4_1')
+            },
+            
+            # Self-ratings (Time 1)
+            'self_ratings': {
+                'attractiveness': data.get('attr3_1'),
+                'sincerity': data.get('sinc3_1'),
+                'intelligence': data.get('intel3_1'),
+                'fun': data.get('fun3_1'),
+                'ambition': data.get('amb3_1')
+            },
+            
+            # Others' perception (Time 1)
+            'others_perception': {
+                'attractiveness': data.get('attr5_1'),
+                'sincerity': data.get('sinc5_1'),
+                'intelligence': data.get('intel5_1'),
+                'fun': data.get('fun5_1'),
+                'ambition': data.get('amb5_1')
+            },
+            
+            # Interests (Time 1) - with ratings!
+            'interests': {
+                'sports': data.get('sports'),
+                'tvsports': data.get('tvsports'),
+                'exercise': data.get('exercise'),
+                'dining': data.get('dining'),
+                'museums': data.get('museums'),
+                'art': data.get('art'),
+                'hiking': data.get('hiking'),
+                'gaming': data.get('gaming'),
+                'clubbing': data.get('clubbing'),
+                'reading': data.get('reading'),
+                'tv': data.get('tv'),
+                'theater': data.get('theater'),
+                'movies': data.get('movies'),
+                'concerts': data.get('concerts'),
+                'music': data.get('music'),
+                'shopping': data.get('shopping'),
+                'yoga': data.get('yoga')
+            }
+        }
+        
+        return pre_event_data
+    
     def _extract_time2_data(self, data: Dict) -> Dict:
         """
         提取 Time 2 (Day After Event) 的所有数据作为 ground truth
@@ -418,6 +509,10 @@ class PersonaGenerator:
             # 生成 person2 的 persona (只包含 Time 1 pre-event 数据)
             persona2_narrative = self._generate_persona_narrative(pair['person2'], 'person2')
             
+            # 提取 Time 1 结构化数据（用于 baseline models）
+            pre_event_person1 = self._extract_pre_event_data(pair['person1']['data'])
+            pre_event_person2 = self._extract_pre_event_data(pair['person2']['data'])
+            
             # 提取 Time 2 数据作为 ground truth（不在 persona 中）
             time2_person1 = self._extract_time2_data(pair['person1']['data'])
             time2_person2 = self._extract_time2_data(pair['person2']['data'])
@@ -431,6 +526,7 @@ class PersonaGenerator:
                     'age': pair['person1']['age'],
                     'persona_narrative': persona1_narrative,
                     'system_prompt': self._create_system_prompt(persona1_narrative, pair['person1']),
+                    'pre_event_data': pre_event_person1,  # NEW: Structured data for ML baselines
                     'time2_reflection': time2_person1  # Time 2 数据单独保存
                 },
                 'person2': {
@@ -439,6 +535,7 @@ class PersonaGenerator:
                     'age': pair['person2']['age'],
                     'persona_narrative': persona2_narrative,
                     'system_prompt': self._create_system_prompt(persona2_narrative, pair['person2']),
+                    'pre_event_data': pre_event_person2,  # NEW: Structured data for ML baselines
                     'time2_reflection': time2_person2  # Time 2 数据单独保存
                 },
                 'ground_truth': pair['ground_truth']
