@@ -132,7 +132,9 @@ class SpeedDatingSimulator:
         # 开场白：Person 1 先说话
         print(f"\n🎬 Round 0: Opening (Person 1 speaks first)")
         
-        opening_prompt = "You just sat down at the speed dating table. Introduce yourself and start the conversation naturally. Remember to be yourself!"
+        opening_prompt = """The bell just rang! You're sitting across from a new person at the speed dating table. Start chatting - be casual and natural like texting someone cute you just matched with. Maybe introduce yourself or ask something fun to break the ice! 
+
+Remember: casual vibes, emojis okay, be specific about your interests, show your personality! 😊"""
         person1_history.append({"role": "user", "content": opening_prompt})
         
         person1_opening = self.call_openrouter_api(person1_history, temperature=0.8)
