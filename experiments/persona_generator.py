@@ -3,9 +3,11 @@ Persona Generator - Phase 1
 
 功能:
 1. 加载 processed_pairs.json
-2. 将数据特征转换为自然语言人物描述
+2. 将数据特征转换为自然语言人物描述（完整编码所有数据，不过滤）
 3. 生成《再见爱人》风格的 Persona prompts
-4. 为 Mistral Nemo 提供角色扮演 system prompt
+4. 为 Mistral Nemo (via OpenRouter API) 提供角色扮演 system prompt
+
+重要: 所有 persona 信息必须完整编码，保留所有原始数据和评分
 """
 
 import json
@@ -85,16 +87,18 @@ class PersonaGenerator:
         print(f"✅ Loaded {len(self.pairs)} pairs")
         return self.pairs
     
-    def _get_top_interests(self, data: Dict, top_n: int = 5) -> List[str]:
-        """获取最感兴趣的活动"""
-        interests = []
+    def _encode_all_interests(self, data: Dict) -> str:
+        """完整编码所有兴趣爱好（不过滤，保留所有评分）"""
+        interests_text = []
         for key, name in INTEREST_NAMES.items():
             if key in data and data[key] is not None:
-                interests.append((name, float(data[key])))
+                score = int(data[key])
+                interests_text.append(f"{name} (rated {score}/10)")
         
-        # 按评分排序
-        interests.sort(key=lambda x: x[1], reverse=True)
-        return [name for name, _ in interests[:top_n]]
+        if interests_text:
+            return "My interests and how much I enjoy them: " + ", ".join(interests_text) + "."
+        else:
+            return "I haven't rated my interests yet."
     
     def _rank_preferences(self, data: Dict, prefix: str = 'attr1_1') -> List[tuple]:
         """
@@ -124,17 +128,17 @@ class PersonaGenerator:
         
         return valid_attrs
     
-    def _generate_preference_text(self, preferences: List[tuple]) -> str:
-        """生成择偶偏好文本"""
+    def _encode_preferences_complete(self, preferences: List[tuple]) -> str:
+        """完整编码择偶偏好（保留所有分数，不过滤）"""
         if not preferences:
             return "balanced across all qualities"
         
-        top3 = preferences[:3]
-        pref_text = ", ".join([f"{name}" for name, _ in top3])
+        # 保留所有偏好和分数
+        pref_text = ", ".join([f"{name} ({int(score)} points)" for name, score in preferences])
         return pref_text
     
-    def _generate_self_perception(self, data: Dict) -> str:
-        """生成自我认知描述"""
+    def _encode_self_ratings_complete(self, data: Dict) -> str:
+        """完整编码自我评价（保留所有分数）"""
         ratings = {
             'attractiveness': data.get('attr3_1'),
             'sincerity': data.get('sinc3_1'),
@@ -143,19 +147,169 @@ class PersonaGenerator:
             'ambition': data.get('amb3_1')
         }
         
-        # 找到最高和最低的评分
-        valid_ratings = [(k, float(v)) for k, v in ratings.items() if v is not None]
+        # 保留所有评分
+        valid_ratings = [(k, int(v)) for k, v in ratings.items() if v is not None]
         if not valid_ratings:
-            return "I'm still figuring out who I am."
+            return "I haven't rated myself yet."
         
         valid_ratings.sort(key=lambda x: x[1], reverse=True)
         
-        strengths = [name for name, score in valid_ratings[:2] if score >= 7]
+        ratings_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_ratings])
+        return f"How I rate myself: {ratings_text}."
+    
+    def _encode_others_perception_complete(self, data: Dict) -> str:
+        """完整编码他人评价预期（保留所有分数）"""
+        perceptions = {
+            'attractiveness': data.get('attr5_1'),
+            'sincerity': data.get('sinc5_1'),
+            'intelligence': data.get('intel5_1'),
+            'fun': data.get('fun5_1'),
+            'ambition': data.get('amb5_1')
+        }
         
-        if strengths:
-            return f"I see myself as {' and '.join(strengths)}."
-        else:
-            return "I'm working on growing in all areas of life."
+        # 保留所有评分
+        valid_perceptions = [(k, int(v)) for k, v in perceptions.items() if v is not None]
+        if not valid_perceptions:
+            return ""
+        
+        valid_perceptions.sort(key=lambda x: x[1], reverse=True)
+        
+        perceptions_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_perceptions])
+        return f"How I expect others would rate me: {perceptions_text}."
+    
+    def _encode_time2_satisfaction(self, data: Dict) -> str:
+        """编码 Time 2 满意度调查"""
+        satis_2 = data.get('satis_2')
+        length = data.get('length')
+        numdat_2 = data.get('numdat_2')
+        
+        if satis_2 is None and length is None and numdat_2 is None:
+            return ""
+        
+        text = "\n\n=== AFTER THE EVENT (Day After Reflection) ===\n"
+        
+        if satis_2 is not None:
+            text += f"My satisfaction with people I met: {int(satis_2)}/10. "
+        
+        if length is not None:
+            length_map = {1: "too little time", 2: "too much time", 3: "just right"}
+            text += f"The 4-minute duration was: {length_map.get(int(length), 'unknown')}. "
+        
+        if numdat_2 is not None:
+            numdat_map = {1: "too few", 2: "too many", 3: "just right"}
+            text += f"The number of dates was: {numdat_map.get(int(numdat_2), 'unknown')}. "
+        
+        return text.strip()
+    
+    def _encode_time2_preferences(self, data: Dict, prefix: str) -> List[tuple]:
+        """编码 Time 2 更新后的偏好（_2 后缀）"""
+        base = prefix.rsplit('_', 1)[0]  # 去掉最后的 _2
+        
+        attrs = {
+            'attractiveness': data.get(f'{base}_2'),
+            'sincerity': data.get(f'sinc{base[4:]}_2'),
+            'intelligence': data.get(f'intel{base[4:]}_2'),
+            'fun': data.get(f'fun{base[4:]}_2'),
+            'ambition': data.get(f'amb{base[4:]}_2'),
+            'shared interests': data.get(f'shar{base[4:]}_2')
+        }
+        
+        # 过滤 None 并排序
+        valid_attrs = [(k, float(v)) for k, v in attrs.items() if v is not None]
+        valid_attrs.sort(key=lambda x: x[1], reverse=True)
+        
+        return valid_attrs
+    
+    def _encode_time2_self_ratings(self, data: Dict) -> str:
+        """编码 Time 2 更新后的自我评价"""
+        ratings = {
+            'attractiveness': data.get('attr3_2'),
+            'sincerity': data.get('sinc3_2'),
+            'intelligence': data.get('intel3_2'),
+            'fun': data.get('fun3_2'),
+            'ambition': data.get('amb3_2')
+        }
+        
+        valid_ratings = [(k, int(v)) for k, v in ratings.items() if v is not None]
+        if not valid_ratings:
+            return ""
+        
+        valid_ratings.sort(key=lambda x: x[1], reverse=True)
+        
+        ratings_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_ratings])
+        return f"Updated self-ratings: {ratings_text}."
+    
+    def _encode_time2_others_perception(self, data: Dict) -> str:
+        """编码 Time 2 更新后的他人评价预期"""
+        perceptions = {
+            'attractiveness': data.get('attr5_2'),
+            'sincerity': data.get('sinc5_2'),
+            'intelligence': data.get('intel5_2'),
+            'fun': data.get('fun5_2'),
+            'ambition': data.get('amb5_2')
+        }
+        
+        valid_perceptions = [(k, int(v)) for k, v in perceptions.items() if v is not None]
+        if not valid_perceptions:
+            return ""
+        
+        valid_perceptions.sort(key=lambda x: x[1], reverse=True)
+        
+        perceptions_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_perceptions])
+        return f"Updated perception of how others see me: {perceptions_text}."
+    
+    def _extract_time2_data(self, data: Dict) -> Dict:
+        """
+        提取 Time 2 (Day After Event) 的所有数据作为 ground truth
+        这些数据不应该在 persona narrative 中，因为是事后反思
+        """
+        time2_data = {
+            'satisfaction': {
+                'satis_2': data.get('satis_2'),
+                'length': data.get('length'),
+                'numdat_2': data.get('numdat_2')
+            },
+            'updated_preferences_self': {
+                'attractiveness': data.get('attr1_2'),
+                'sincerity': data.get('sinc1_2'),
+                'intelligence': data.get('intel1_2'),
+                'fun': data.get('fun1_2'),
+                'ambition': data.get('amb1_2'),
+                'shared_interests': data.get('shar1_2')
+            },
+            'updated_preferences_opposite': {
+                'attractiveness': data.get('attr2_2'),
+                'sincerity': data.get('sinc2_2'),
+                'intelligence': data.get('intel2_2'),
+                'fun': data.get('fun2_2'),
+                'ambition': data.get('amb2_2'),
+                'shared_interests': data.get('shar2_2')
+            },
+            'updated_preferences_same': {
+                'attractiveness': data.get('attr4_2'),
+                'sincerity': data.get('sinc4_2'),
+                'intelligence': data.get('intel4_2'),
+                'fun': data.get('fun4_2'),
+                'ambition': data.get('amb4_2'),
+                'shared_interests': data.get('shar4_2')
+            },
+            'updated_self_ratings': {
+                'attractiveness': data.get('attr3_2'),
+                'sincerity': data.get('sinc3_2'),
+                'intelligence': data.get('intel3_2'),
+                'fun': data.get('fun3_2'),
+                'ambition': data.get('amb3_2')
+            },
+            'updated_others_perception': {
+                'attractiveness': data.get('attr5_2'),
+                'sincerity': data.get('sinc5_2'),
+                'intelligence': data.get('intel5_2'),
+                'fun': data.get('fun5_2'),
+                'ambition': data.get('amb5_2')
+            }
+        }
+        
+        return time2_data
     
     def _generate_persona_narrative(self, person_data: Dict, person_key: str) -> str:
         """
@@ -186,66 +340,65 @@ class PersonaGenerator:
         imprace = int(data.get('imprace', 5))
         imprelig = int(data.get('imprelig', 5))
         
-        # 期望
+        # 期望（完整编码，不过滤）
         exphappy = int(data.get('exphappy', 5))
         
-        # 择偶偏好
+        # 择偶偏好（完整编码所有分数）
         self_prefs = self._rank_preferences(data, 'attr1_1')
         opp_sex_prefs = self._rank_preferences(data, 'attr2_1')
         same_sex_prefs = self._rank_preferences(data, 'attr4_1')
         
-        # 自我认知
-        self_perception = self._generate_self_perception(data)
+        # 自我评价（完整编码）
+        self_ratings = self._encode_self_ratings_complete(data)
         
-        # 兴趣爱好
-        top_interests = self._get_top_interests(data, top_n=5)
+        # 他人评价预期（完整编码）
+        others_perception = self._encode_others_perception_complete(data)
         
-        # 构建叙事
+        # 兴趣爱好（完整编码所有评分）
+        all_interests = self._encode_all_interests(data)
+        
+        # 构建叙事 - 完整编码所有信息
         narrative = f"""I'm a {age}-year-old {gender} studying {field}, with plans to become a {career}. """
         
         if race:
             narrative += f"I'm {race}. "
         
-        # 生活状态
+        # 生活状态（完整保留原始值）
         narrative += f"\n\nIn my daily life, I go out {go_out_freq}, though I only go on dates {date_freq}. "
         narrative += f"I came to this speed dating event to {goal}. "
+        narrative += f"My expected happiness for tonight: {exphappy}/10. "
         
-        if exphappy >= 7:
-            narrative += f"I'm quite optimistic and expect to have a good time tonight. "
-        elif exphappy <= 4:
-            narrative += f"I'm not sure what to expect, but I'm keeping an open mind. "
+        # 价值观（完整编码，保留原始分数）
+        narrative += f"\n\nImportance of same race in dating: {imprace}/10. "
+        narrative += f"Importance of same religion in dating: {imprelig}/10. "
         
-        # 择偶观
-        narrative += f"\n\nWhen it comes to dating, what I value most is {self._generate_preference_text(self_prefs)}. "
+        # 择偶观（完整编码所有偏好分数）
+        narrative += f"\n\nWhat I value in a potential date (out of 100 points total): {self._encode_preferences_complete(self_prefs)}. "
         
         if opp_sex_prefs:
-            opp_pref_text = self._generate_preference_text(opp_sex_prefs)
-            narrative += f"I think the opposite sex usually looks for {opp_pref_text}. "
+            narrative += f"\n\nWhat I think the opposite sex looks for: {self._encode_preferences_complete(opp_sex_prefs)}. "
         
-        # 价值观
-        if imprace >= 7:
-            narrative += f"It's quite important to me that my partner shares my racial/ethnic background. "
-        if imprelig >= 7:
-            narrative += f"Religious compatibility is also important to me. "
+        if same_sex_prefs:
+            narrative += f"\n\nWhat I think my same sex looks for: {self._encode_preferences_complete(same_sex_prefs)}. "
         
-        # 自我认知
-        narrative += f"\n\n{self_perception} "
+        # 自我认知（完整编码）
+        narrative += f"\n\n{self_ratings} "
         
-        # 兴趣爱好
-        if top_interests:
-            interests_text = ", ".join(top_interests[:3])
-            narrative += f"In my free time, I really enjoy {interests_text}"
-            if len(top_interests) > 3:
-                narrative += f", among other things"
-            narrative += ". "
+        # 他人评价预期（如果有）
+        if others_perception:
+            narrative += f"{others_perception} "
+        
+        # 兴趣爱好（完整编码所有活动评分）
+        narrative += f"\n\n{all_interests} "
         
         # 结尾：对感情的态度
+        narrative += "\n\n"
         if goal == "find a serious relationship":
-            narrative += f"\n\nI'm genuinely looking for something meaningful and long-term. I'm ready to invest emotionally and see where things go with the right person."
+            narrative += f"I'm genuinely looking for something meaningful and long-term. I'm ready to invest emotionally and see where things go with the right person."
         elif goal == "get a date":
-            narrative += f"\n\nI'm open to seeing where things lead. If I meet someone interesting, I'd definitely want to get to know them better."
+            narrative += f"I'm open to seeing where things lead. If I meet someone interesting, I'd definitely want to get to know them better."
         else:
-            narrative += f"\n\nI'm here with an open heart, curious to see who I'll meet and what connections might form."
+            narrative += f"I'm here with an open heart, curious to see who I'll meet and what connections might form."
         
         return narrative.strip()
     
@@ -259,11 +412,15 @@ class PersonaGenerator:
         for pair in self.pairs:
             pair_id = pair['pair_id']
             
-            # 生成 person1 的 persona
+            # 生成 person1 的 persona (只包含 Time 1 pre-event 数据)
             persona1_narrative = self._generate_persona_narrative(pair['person1'], 'person1')
             
-            # 生成 person2 的 persona
+            # 生成 person2 的 persona (只包含 Time 1 pre-event 数据)
             persona2_narrative = self._generate_persona_narrative(pair['person2'], 'person2')
+            
+            # 提取 Time 2 数据作为 ground truth（不在 persona 中）
+            time2_person1 = self._extract_time2_data(pair['person1']['data'])
+            time2_person2 = self._extract_time2_data(pair['person2']['data'])
             
             # 构建 persona 对象
             persona_pair = {
@@ -273,14 +430,16 @@ class PersonaGenerator:
                     'gender': pair['person1']['gender'],
                     'age': pair['person1']['age'],
                     'persona_narrative': persona1_narrative,
-                    'system_prompt': self._create_system_prompt(persona1_narrative, pair['person1'])
+                    'system_prompt': self._create_system_prompt(persona1_narrative, pair['person1']),
+                    'time2_reflection': time2_person1  # Time 2 数据单独保存
                 },
                 'person2': {
                     'iid': pair['person2']['iid'],
                     'gender': pair['person2']['gender'],
                     'age': pair['person2']['age'],
                     'persona_narrative': persona2_narrative,
-                    'system_prompt': self._create_system_prompt(persona2_narrative, pair['person2'])
+                    'system_prompt': self._create_system_prompt(persona2_narrative, pair['person2']),
+                    'time2_reflection': time2_person2  # Time 2 数据单独保存
                 },
                 'ground_truth': pair['ground_truth']
             }
@@ -297,33 +456,38 @@ class PersonaGenerator:
     
     def _create_system_prompt(self, narrative: str, person_data: Dict) -> str:
         """
-        为 Mistral Nemo 创建 system prompt
+        为 Mistral Nemo (via OpenRouter API) 创建 system prompt
         
         Args:
-            narrative: 人物叙事
+            narrative: 完整编码的人物叙事（包含所有原始数据）
             person_data: person1 或 person2 的数据
         
         Returns:
-            System prompt 文本
+            System prompt 文本（用于 OpenRouter API 调用）
         """
         gender = "woman" if person_data['gender'] == 0 else "man"
         age = person_data['age']
         
-        system_prompt = f"""You are roleplaying as a real person in a speed dating scenario. Here is your character:
+        system_prompt = f"""You are roleplaying as a real person in a speed dating scenario. Here is your complete character profile with all your ratings and preferences:
 
 {narrative}
 
-IMPORTANT INSTRUCTIONS:
-1. Stay completely in character - respond as this person would, using first person ("I", "me", "my")
-2. Be natural and conversational, as if you're really on a 4-minute speed date
-3. Show genuine emotions and reactions based on your personality and values
-4. Ask questions about your date partner to show interest
-5. Share personal stories and experiences that reflect your character
-6. React authentically - if something resonates with you, show excitement; if not, be honest but polite
-7. Keep track of what you learn about your partner throughout the conversation
-8. Your responses should be 2-4 sentences unless asked for more detail
+CRITICAL INSTRUCTIONS:
+1. STAY IN CHARACTER - You ARE this person. All the ratings and preferences above define your authentic personality.
+2. Your responses must reflect the specific ratings you gave yourself and your stated preferences.
+3. For example:
+   - If you rated attractiveness highly in what you look for, show that in your reactions
+   - If you gave yourself low fun rating, don't act overly playful
+   - If you said religion importance is 9/10, it should matter in conversation
+   - If you rated gaming 10/10 but museums 2/10, your interests should reflect that
 
-Remember: You are a {age}-year-old {gender} on a real speed date. Be yourself, be genuine, and see if there's a connection!"""
+4. Be natural and conversational, as if you're really on a 4-minute speed date
+5. Show genuine emotions and reactions based on YOUR SPECIFIC personality traits and numerical ratings
+6. Speak in a way align with what YOU value most (based on your preference points allocation)
+7. React authentically - let your ratings guide your enthusiasm or hesitation
+8. Keep responses 2-4 sentences unless asked for more detail
+
+Remember: You are a {age}-year-old {gender} with THESE EXACT preferences and ratings. Every response should be consistent with the numerical data provided about your character!"""
         
         return system_prompt
     

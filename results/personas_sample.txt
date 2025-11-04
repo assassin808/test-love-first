@@ -7,11 +7,19 @@ Ground Truth: MATCHED
 
 I'm a 24-year-old woman studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm European/Caucasian-American. 
 
-In my daily life, I go out several times a week, though I only go on dates twice a week. I came to this speed dating event to other reasons. I'm quite optimistic and expect to have a good time tonight. 
+In my daily life, I go out several times a week, though I only go on dates twice a week. I came to this speed dating event to other reasons. My expected happiness for tonight: 7/10. 
 
-When it comes to dating, what I value most is attractiveness, sincerity, intelligence. I think the opposite sex usually looks for attractiveness, intelligence, fun. It's quite important to me that my partner shares my racial/ethnic background. 
+Importance of same race in dating: 7/10. Importance of same religion in dating: 4/10. 
 
-I see myself as attractiveness and sincerity. In my free time, I really enjoy exercising/bodybuilding, dining out, visiting museums/galleries, among other things. 
+What I value in a potential date (out of 100 points total): attractiveness (20 points), sincerity (20 points), intelligence (20 points), fun (20 points), ambition (20 points), shared interests (0 points). 
+
+What I think the opposite sex looks for: attractiveness (60 points), intelligence (15 points), fun (10 points), sincerity (5 points), ambition (5 points), shared interests (5 points). 
+
+What I think my same sex looks for: attractiveness (50 points), intelligence (20 points), fun (15 points), sincerity (10 points), ambition (5 points), shared interests (0 points). 
+
+How I rate myself: attractiveness (8/10), sincerity (8/10), intelligence (8/10), fun (8/10), ambition (8/10). How I expect others would rate me: attractiveness (8/10), sincerity (8/10), intelligence (8/10), ambition (8/10), fun (7/10). 
+
+My interests and how much I enjoy them: playing sports/athletics (rated 8/10), watching sports (rated 4/10), exercising/bodybuilding (rated 9/10), dining out (rated 9/10), visiting museums/galleries (rated 9/10), art (rated 9/10), hiking/camping (rated 8/10), gaming (rated 5/10), dancing/clubbing (rated 8/10), reading (rated 9/10), watching TV (rated 8/10), theater (rated 9/10), movies (rated 9/10), concerts (rated 9/10), music (rated 9/10), shopping (rated 9/10), yoga/meditation (rated 9/10). 
 
 I'm here with an open heart, curious to see who I'll meet and what connections might form.
 
@@ -19,11 +27,19 @@ I'm here with an open heart, curious to see who I'll meet and what connections m
 
 I'm a 30-year-old man studying Biological Sciences/Chemistry/Physics, with plans to become a Academic/Researcher. I'm Other. 
 
-In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. I'm quite optimistic and expect to have a good time tonight. 
+In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. My expected happiness for tonight: 7/10. 
 
-When it comes to dating, what I value most is attractiveness, intelligence, fun. I think the opposite sex usually looks for sincerity, intelligence, ambition. 
+Importance of same race in dating: 1/10. Importance of same religion in dating: 1/10. 
 
-I see myself as attractiveness and sincerity. In my free time, I really enjoy playing sports/athletics, watching sports, exercising/bodybuilding, among other things. 
+What I value in a potential date (out of 100 points total): attractiveness (30 points), intelligence (30 points), fun (30 points), ambition (10 points), sincerity (0 points), shared interests (0 points). 
+
+What I think the opposite sex looks for: sincerity (30 points), intelligence (30 points), ambition (30 points), shared interests (10 points), attractiveness (0 points), fun (0 points). 
+
+What I think my same sex looks for: attractiveness (50 points), intelligence (30 points), fun (20 points), sincerity (0 points), ambition (0 points), shared interests (0 points). 
+
+How I rate myself: attractiveness (10/10), sincerity (10/10), intelligence (10/10), fun (10/10), ambition (10/10). How I expect others would rate me: attractiveness (10/10), sincerity (10/10), intelligence (10/10), fun (10/10), ambition (10/10). 
+
+My interests and how much I enjoy them: playing sports/athletics (rated 10/10), watching sports (rated 10/10), exercising/bodybuilding (rated 10/10), dining out (rated 10/10), visiting museums/galleries (rated 10/10), art (rated 10/10), hiking/camping (rated 10/10), gaming (rated 2/10), dancing/clubbing (rated 4/10), reading (rated 10/10), watching TV (rated 7/10), theater (rated 5/10), movies (rated 5/10), concerts (rated 2/10), music (rated 5/10), shopping (rated 10/10), yoga/meditation (rated 10/10). 
 
 I'm here with an open heart, curious to see who I'll meet and what connections might form.
 
@@ -37,11 +53,19 @@ Ground Truth: MATCHED
 
 I'm a 26-year-old woman studying Social Science/Psychology, with plans to become a Undecided. I'm Black/African American. 
 
-In my daily life, I go out twice a week, though I only go on dates several times a year. I came to this speed dating event to have a fun night out. I'm not sure what to expect, but I'm keeping an open mind. 
+In my daily life, I go out twice a week, though I only go on dates several times a year. I came to this speed dating event to have a fun night out. My expected happiness for tonight: 1/10. 
 
-When it comes to dating, what I value most is attractiveness, sincerity, intelligence. I think the opposite sex usually looks for attractiveness, sincerity, intelligence. It's quite important to me that my partner shares my racial/ethnic background. Religious compatibility is also important to me. 
+Importance of same race in dating: 9/10. Importance of same religion in dating: 10/10. 
 
-I see myself as attractiveness and sincerity. In my free time, I really enjoy reading, shopping, music, among other things. 
+What I value in a potential date (out of 100 points total): attractiveness (20 points), sincerity (20 points), intelligence (20 points), ambition (20 points), fun (10 points), shared interests (10 points). 
+
+What I think the opposite sex looks for: attractiveness (50 points), sincerity (30 points), intelligence (5 points), fun (5 points), ambition (5 points), shared interests (5 points). 
+
+What I think my same sex looks for: sincerity (30 points), intelligence (30 points), ambition (20 points), attractiveness (10 points), fun (5 points), shared interests (5 points). 
+
+How I rate myself: attractiveness (8/10), sincerity (8/10), intelligence (8/10), fun (8/10), ambition (5/10). How I expect others would rate me: intelligence (10/10), fun (9/10), attractiveness (8/10), ambition (8/10), sincerity (7/10). 
+
+My interests and how much I enjoy them: playing sports/athletics (rated 1/10), watching sports (rated 1/10), exercising/bodybuilding (rated 1/10), dining out (rated 5/10), visiting museums/galleries (rated 7/10), art (rated 7/10), hiking/camping (rated 7/10), gaming (rated 1/10), dancing/clubbing (rated 3/10), reading (rated 9/10), watching TV (rated 4/10), theater (rated 7/10), movies (rated 7/10), concerts (rated 7/10), music (rated 8/10), shopping (rated 9/10), yoga/meditation (rated 6/10). 
 
 I'm here with an open heart, curious to see who I'll meet and what connections might form.
 
@@ -49,11 +73,19 @@ I'm here with an open heart, curious to see who I'll meet and what connections m
 
 I'm a 24-year-old man studying Social Science/Psychology, with plans to become a Academic/Researcher. I'm Latino/Hispanic American. 
 
-In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to get a date. 
+In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to get a date. My expected happiness for tonight: 6/10. 
 
-When it comes to dating, what I value most is attractiveness, intelligence, fun. I think the opposite sex usually looks for intelligence, fun, ambition. 
+Importance of same race in dating: 3/10. Importance of same religion in dating: 3/10. 
 
-I see myself as fun and intelligence. In my free time, I really enjoy reading, music, concerts, among other things. 
+What I value in a potential date (out of 100 points total): attractiveness (30 points), intelligence (20 points), fun (20 points), sincerity (10 points), ambition (10 points), shared interests (10 points). 
+
+What I think the opposite sex looks for: intelligence (25 points), fun (25 points), ambition (25 points), attractiveness (10 points), sincerity (10 points), shared interests (5 points). 
+
+What I think my same sex looks for: attractiveness (40 points), fun (30 points), intelligence (10 points), ambition (10 points), sincerity (5 points), shared interests (5 points). 
+
+How I rate myself: fun (10/10), intelligence (9/10), ambition (9/10), attractiveness (7/10), sincerity (7/10). How I expect others would rate me: intelligence (9/10), fun (9/10), sincerity (8/10), ambition (8/10), attractiveness (7/10). 
+
+My interests and how much I enjoy them: playing sports/athletics (rated 3/10), watching sports (rated 3/10), exercising/bodybuilding (rated 4/10), dining out (rated 7/10), visiting museums/galleries (rated 6/10), art (rated 5/10), hiking/camping (rated 4/10), gaming (rated 5/10), dancing/clubbing (rated 1/10), reading (rated 10/10), watching TV (rated 7/10), theater (rated 6/10), movies (rated 8/10), concerts (rated 9/10), music (rated 10/10), shopping (rated 8/10), yoga/meditation (rated 7/10). 
 
 I'm open to seeing where things lead. If I meet someone interesting, I'd definitely want to get to know them better.
 
@@ -67,11 +99,19 @@ Ground Truth: MATCHED
 
 I'm a 29-year-old woman studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm Asian/Pacific Islander/Asian-American. 
 
-In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. I'm not sure what to expect, but I'm keeping an open mind. 
+In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. My expected happiness for tonight: 2/10. 
 
-When it comes to dating, what I value most is attractiveness, sincerity, intelligence. I think the opposite sex usually looks for attractiveness, sincerity, shared interests. 
+Importance of same race in dating: 1/10. Importance of same religion in dating: 1/10. 
 
-I see myself as sincerity and attractiveness. In my free time, I really enjoy playing sports/athletics, dining out, visiting museums/galleries, among other things. 
+What I value in a potential date (out of 100 points total): attractiveness (90 points), sincerity (2 points), intelligence (2 points), fun (2 points), ambition (2 points), shared interests (2 points). 
+
+What I think the opposite sex looks for: attractiveness (90 points), sincerity (5 points), shared interests (5 points), fun (3 points), intelligence (2 points), ambition (0 points). 
+
+What I think my same sex looks for: sincerity (35 points), attractiveness (15 points), intelligence (15 points), shared interests (15 points), fun (10 points), ambition (10 points). 
+
+How I rate myself: sincerity (10/10), attractiveness (8/10), intelligence (8/10), fun (8/10), ambition (8/10). How I expect others would rate me: sincerity (10/10), attractiveness (8/10), intelligence (8/10), fun (8/10), ambition (8/10). 
+
+My interests and how much I enjoy them: playing sports/athletics (rated 8/10), watching sports (rated 1/10), exercising/bodybuilding (rated 5/10), dining out (rated 7/10), visiting museums/galleries (rated 7/10), art (rated 7/10), hiking/camping (rated 4/10), gaming (rated 1/10), dancing/clubbing (rated 3/10), reading (rated 4/10), watching TV (rated 1/10), theater (rated 3/10), movies (rated 4/10), concerts (rated 6/10), music (rated 7/10), shopping (rated 6/10), yoga/meditation (rated 3/10). 
 
 I'm here with an open heart, curious to see who I'll meet and what connections might form.
 
@@ -79,11 +119,19 @@ I'm here with an open heart, curious to see who I'll meet and what connections m
 
 I'm a 27-year-old man studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm Other. 
 
-In my daily life, I go out several times a week, though I only go on dates twice a month. I came to this speed dating event to have a fun night out. 
+In my daily life, I go out several times a week, though I only go on dates twice a month. I came to this speed dating event to have a fun night out. My expected happiness for tonight: 6/10. 
 
-When it comes to dating, what I value most is attractiveness, intelligence, fun. I think the opposite sex usually looks for fun, attractiveness, ambition. 
+Importance of same race in dating: 1/10. Importance of same religion in dating: 1/10. 
 
-I see myself as intelligence and fun. In my free time, I really enjoy exercising/bodybuilding, hiking/camping, dancing/clubbing, among other things. 
+What I value in a potential date (out of 100 points total): attractiveness (25 points), intelligence (20 points), fun (20 points), sincerity (15 points), ambition (15 points), shared interests (5 points). 
+
+What I think the opposite sex looks for: fun (25 points), attractiveness (20 points), ambition (20 points), sincerity (15 points), intelligence (15 points), shared interests (5 points). 
+
+What I think my same sex looks for: attractiveness (35 points), fun (30 points), intelligence (15 points), shared interests (10 points), sincerity (5 points), ambition (5 points). 
+
+How I rate myself: intelligence (8/10), fun (8/10), ambition (8/10), sincerity (6/10), attractiveness (5/10). How I expect others would rate me: sincerity (8/10), fun (8/10), ambition (7/10), intelligence (6/10), attractiveness (5/10). 
+
+My interests and how much I enjoy them: playing sports/athletics (rated 7/10), watching sports (rated 1/10), exercising/bodybuilding (rated 8/10), dining out (rated 7/10), visiting museums/galleries (rated 5/10), art (rated 1/10), hiking/camping (rated 8/10), gaming (rated 6/10), dancing/clubbing (rated 8/10), reading (rated 6/10), watching TV (rated 3/10), theater (rated 7/10), movies (rated 7/10), concerts (rated 4/10), music (rated 7/10), shopping (rated 6/10), yoga/meditation (rated 1/10). 
 
 I'm here with an open heart, curious to see who I'll meet and what connections might form.
 
