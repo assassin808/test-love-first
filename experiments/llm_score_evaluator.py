@@ -150,8 +150,12 @@ def extract_score_from_response(response: str, score_type: str = "participant") 
     Returns:
         0-10之间的分数，如果提取失败返回5.0（中间值）
     """
-    # 寻找评分模式（支持中英文）
+    # 寻找评分模式（支持中英文 + new two-question format）
     patterns = [
+        # NEW FORMAT - Two-question format
+        r'like\s*score\s*[:=]\s*(\d+(?:\.\d+)?)(?:\s*/\s*10)?',
+        r'compatibility\s*score\s*[:=]\s*(\d+(?:\.\d+)?)(?:\s*/\s*10)?',
+        r'your\s*rating\s*[:=]\s*(\d+(?:\.\d+)?)(?:\s*/\s*10)?',
         # Chinese formats
         r'评分[：:]\s*(\d+(?:\.\d+)?)',
         r'分数[：:]\s*(\d+(?:\.\d+)?)',
@@ -417,13 +421,20 @@ def get_participant_score_prompt(person_data: Dict, partner_data: Dict, conversa
 
     prompt = (
         "You are Person A in a speed dating session. Based on your own perspective and preferences, "
-        "rate your willingness to meet the partner again after reading the entire conversation transcript.\n\n"
+        "please answer two questions after reading the entire conversation transcript.\n\n"
         f"Your background (for context): {persona_block}\n\n"
         "Conversation transcript:\n"
         f"{conversation_text}\n\n"
-        "Please reply in English. Start your answer with a single line in the exact format:\n"
-        "Score: X.X/10\n"
-        "Then provide 1-2 short sentences explaining your reasoning."
+        "Please reply in English. Answer these two questions:\n\n"
+        "Question 1: How much do you like this person?\n"
+        "Scale: 1 = don't like at all, 10 = like a lot\n"
+        "Your rating: X.X/10\n\n"
+        "Question 2: Would you like to see him or her again?\n"
+        "Answer: Yes or No\n\n"
+        "Format your response as:\n"
+        "Like Score: X.X/10\n"
+        "See Again: Yes/No\n"
+        "Reasoning: [1-2 short sentences explaining your ratings]"
     )
     return prompt
 
@@ -442,14 +453,21 @@ def get_observer_score_prompt(person1_data: Dict, person2_data: Dict, conversati
 
     prompt = (
         "You are an experienced relationship observer reviewing a speed dating conversation. "
-        "Evaluate the overall match quality between the two participants.\n\n"
+        "Evaluate the overall match quality between the two participants by answering two questions.\n\n"
         f"Person 1 background: {p1}\n"
         f"Person 2 background: {p2}\n\n"
         "Conversation transcript:\n"
         f"{conversation_text}\n\n"
-        "Please reply in English. Start your answer with a single line in the exact format:\n"
-        "Score: X.X/10\n"
-        "Then provide 2-3 concise sentences explaining your assessment, considering: values/interests alignment, conversational flow, mutual attraction/chemistry, and long-term potential."
+        "Please reply in English. Answer these two questions:\n\n"
+        "Question 1: How compatible do you think they are?\n"
+        "Scale: 1 = not compatible at all, 10 = extremely compatible\n"
+        "Your rating: X.X/10\n\n"
+        "Question 2: Do you think they should see each other again?\n"
+        "Answer: Yes or No\n\n"
+        "Format your response as:\n"
+        "Compatibility Score: X.X/10\n"
+        "Should Meet Again: Yes/No\n"
+        "Reasoning: [2-3 concise sentences explaining your assessment, considering: values/interests alignment, conversational flow, mutual attraction/chemistry, and long-term potential]"
     )
     return prompt
 

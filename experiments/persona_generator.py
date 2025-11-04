@@ -517,6 +517,16 @@ class PersonaGenerator:
             time2_person1 = self._extract_time2_data(pair['person1']['data'])
             time2_person2 = self._extract_time2_data(pair['person2']['data'])
             
+            # ENHANCEMENT: Add partner demographic features
+            partner1_age = pair['person2']['age']
+            partner1_race = pair['person2']['data'].get('race')
+            person1_race = pair['person1']['data'].get('race')
+            partner2_age = pair['person1']['age']
+            partner2_race = pair['person1']['data'].get('race')
+            person2_race = pair['person2']['data'].get('race')
+            
+            same_race = (person1_race == person2_race) if (person1_race and person2_race) else None
+            
             # 构建 persona 对象
             persona_pair = {
                 'pair_id': pair_id,
@@ -524,19 +534,29 @@ class PersonaGenerator:
                     'iid': pair['person1']['iid'],
                     'gender': pair['person1']['gender'],
                     'age': pair['person1']['age'],
+                    'race': person1_race,
                     'persona_narrative': persona1_narrative,
                     'system_prompt': self._create_system_prompt(persona1_narrative, pair['person1']),
                     'pre_event_data': pre_event_person1,  # NEW: Structured data for ML baselines
-                    'time2_reflection': time2_person1  # Time 2 数据单独保存
+                    'time2_reflection': time2_person1,  # Time 2 数据单独保存
+                    # ENHANCEMENT: Partner demographics
+                    'partner_age': partner1_age,
+                    'partner_race': partner1_race,
+                    'same_race': same_race
                 },
                 'person2': {
                     'iid': pair['person2']['iid'],
                     'gender': pair['person2']['gender'],
                     'age': pair['person2']['age'],
+                    'race': person2_race,
                     'persona_narrative': persona2_narrative,
                     'system_prompt': self._create_system_prompt(persona2_narrative, pair['person2']),
                     'pre_event_data': pre_event_person2,  # NEW: Structured data for ML baselines
-                    'time2_reflection': time2_person2  # Time 2 数据单独保存
+                    'time2_reflection': time2_person2,  # Time 2 数据单独保存
+                    # ENHANCEMENT: Partner demographics
+                    'partner_age': partner2_age,
+                    'partner_race': partner2_race,
+                    'same_race': same_race
                 },
                 'ground_truth': pair['ground_truth']
             }
@@ -571,7 +591,7 @@ class PersonaGenerator:
         else:
             name = "Jake"
         
-        system_prompt = f"""You are {name}, a {age}-year-old {gender} at a speed dating event. This is a REAL STRANGER you're meeting for the first time - be natural and cautious.
+        system_prompt = f"""You are {name}, a {age}-year-old {gender} participating in a speed dating event tonight. Over the course of the evening, you will have brief 4-minute conversations with 20 different people. This is a REAL STRANGER you're meeting for the first time - be natural and cautious.
 
 YOUR BACKGROUND & PERSONALITY:
 {narrative}
@@ -638,11 +658,13 @@ Oh nice, I'm into basketball too! [Smiles genuinely] I actually try to catch Lak
    - Let this shape your tone: active/passive, flirty/reserved, deep/light
 
 7. **SPEED DATING CONTEXT**
-   - You have ~4 minutes total to chat
+   - Tonight you'll meet 20 different people (this person is one of them)
+   - You have ~4 minutes total for each chat
    - You're sitting across from a stranger at a small table
    - Others are chatting nearby (it's a bit loud)
    - Bell will ring when time's up
-   - You'll decide at the end: want to see them again?
+   - After each conversation, you'll decide: want to see them again?
+   - Remember: you're evaluating them among 20 potential matches
 
 8. **REALISTIC STRANGER INTERACTION**
    - Start with small talk (weather, event itself, nervousness)
