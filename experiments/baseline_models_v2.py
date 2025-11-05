@@ -47,6 +47,19 @@ except ImportError:
 
 warnings.filterwarnings('ignore')
 
+def _fit_linear_calibration(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
+    """Fit linear calibration y ≈ kx + b (least squares)."""
+    x = np.asarray(x).reshape(-1)
+    y = np.asarray(y).reshape(-1)
+    A = np.vstack([x, np.ones_like(x)]).T
+    sol, *_ = np.linalg.lstsq(A, y, rcond=None)
+    k, b = float(sol[0]), float(sol[1])
+    return k, b
+
+def _apply_calibration(x: np.ndarray, k: float, b: float) -> np.ndarray:
+    y = k * np.asarray(x) + b
+    return np.clip(y, 0.0, 1.0)
+
 
 class BaselineModel:
     """
@@ -290,124 +303,7 @@ class BaselineModel:
         features.append(float(person2_data.get('imprace', 0) or 0))
         features.append(float(person2_data.get('imprelig', 0) or 0))
         
-        # === DERIVED FEATURES ===
-        
-        # Interest overlap
-        if isinstance(interests1, dict):
-            p1_interests_high = set(k for k in interest_keys if float(interests1.get(k, 0) or 0) > 5)
-        else:
-            p1_interests_high = set(k for k in interest_keys if float(person1_data.get(k, 0) or 0) > 5)
-        
-        if isinstance(interests2, dict):
-            p2_interests_high = set(k for k in interest_keys if float(interests2.get(k, 0) or 0) > 5)
-        else:
-            p2_interests_high = set(k for k in interest_keys if float(person2_data.get(k, 0) or 0) > 5)
-        
-        if len(p1_interests_high) + len(p2_interests_high) > 0:
-            interest_overlap = len(p1_interests_high & p2_interests_high) / len(p1_interests_high | p2_interests_high)
-        else:
-            interest_overlap = 0.0
-        features.append(float(interest_overlap))
-        
-        # Preference-rating alignments
-        # P1 values what P2 has
-        if isinstance(prefs1, dict):
-            p1_pref_vec = np.array([
-                float(prefs1.get('attractiveness', 0) or 0),
-                float(prefs1.get('sincerity', 0) or 0),
-                float(prefs1.get('intelligence', 0) or 0),
-                float(prefs1.get('fun', 0) or 0),
-                float(prefs1.get('ambition', 0) or 0)
-            ])
-        else:
-            p1_pref_vec = np.array([
-                float(person1_data.get('attr1_1', 0) or 0),
-                float(person1_data.get('sinc1_1', 0) or 0),
-                float(person1_data.get('intel1_1', 0) or 0),
-                float(person1_data.get('fun1_1', 0) or 0),
-                float(person1_data.get('amb1_1', 0) or 0)
-            ])
-        
-        if isinstance(ratings2, dict) and len(ratings2) > 0:
-            p2_rating_vec = np.array([
-                float(ratings2.get('attractiveness', 0) or 0),
-                float(ratings2.get('sincerity', 0) or 0),
-                float(ratings2.get('intelligence', 0) or 0),
-                float(ratings2.get('fun', 0) or 0),
-                float(ratings2.get('ambition', 0) or 0)
-            ])
-        else:
-            p2_rating_vec = np.array([
-                float(person2_data.get('attr3_1', 0) or 0),
-                float(person2_data.get('sinc3_1', 0) or 0),
-                float(person2_data.get('intel3_1', 0) or 0),
-                float(person2_data.get('fun3_1', 0) or 0),
-                float(person2_data.get('amb3_1', 0) or 0)
-            ])
-        
-        if np.std(p1_pref_vec) > 0 and np.std(p2_rating_vec) > 0:
-            alignment = np.corrcoef(p1_pref_vec, p2_rating_vec)[0, 1]
-            if np.isnan(alignment):
-                alignment = 0.0
-        else:
-            alignment = 0.0
-        features.append(float(alignment))
-        
-        # Reverse alignment
-        if isinstance(prefs2, dict):
-            p2_pref_vec = np.array([
-                float(prefs2.get('attractiveness', 0) or 0),
-                float(prefs2.get('sincerity', 0) or 0),
-                float(prefs2.get('intelligence', 0) or 0),
-                float(prefs2.get('fun', 0) or 0),
-                float(prefs2.get('ambition', 0) or 0)
-            ])
-        else:
-            p2_pref_vec = np.array([
-                float(person2_data.get('attr1_1', 0) or 0),
-                float(person2_data.get('sinc1_1', 0) or 0),
-                float(person2_data.get('intel1_1', 0) or 0),
-                float(person2_data.get('fun1_1', 0) or 0),
-                float(person2_data.get('amb1_1', 0) or 0)
-            ])
-        
-        if isinstance(ratings1, dict) and len(ratings1) > 0:
-            p1_rating_vec = np.array([
-                float(ratings1.get('attractiveness', 0) or 0),
-                float(ratings1.get('sincerity', 0) or 0),
-                float(ratings1.get('intelligence', 0) or 0),
-                float(ratings1.get('fun', 0) or 0),
-                float(ratings1.get('ambition', 0) or 0)
-            ])
-        else:
-            p1_rating_vec = np.array([
-                float(person1_data.get('attr3_1', 0) or 0),
-                float(person1_data.get('sinc3_1', 0) or 0),
-                float(person1_data.get('intel3_1', 0) or 0),
-                float(person1_data.get('fun3_1', 0) or 0),
-                float(person1_data.get('amb3_1', 0) or 0)
-            ])
-        
-        if np.std(p2_pref_vec) > 0 and np.std(p1_rating_vec) > 0:
-            reverse_alignment = np.corrcoef(p2_pref_vec, p1_rating_vec)[0, 1]
-            if np.isnan(reverse_alignment):
-                reverse_alignment = 0.0
-        else:
-            reverse_alignment = 0.0
-        features.append(float(reverse_alignment))
-        
-        # Age difference
-        age1 = float(person1_data.get('age', 25))
-        age2 = float(person2_data.get('age', 25))
-        age_diff = abs(age1 - age2) / 20.0
-        features.append(float(age_diff))
-        
-        # Same race
-        features.append(1.0 if race1 == race2 else 0.0)
-        
-        # Goal compatibility
-        features.append(1.0 if goal1 == 4 and goal2 == 4 else 0.0)
-        
+        # Strict parity: do not add engineered/derived features beyond raw fields used in LLM prompts
         return np.array(features)
     
     def _extract_features_v2(self, person1_data: Dict, person2_data: Dict) -> np.ndarray:
@@ -612,16 +508,7 @@ def create_train_test_split(
     return train_df
 
 
-def convert_csv_to_pair_format(row: pd.Series) -> Dict:
-        # We need to find the partner (pid) - this is tricky with the CSV format
-        # For now, use the row as both sides (will need refinement)
-        person2_data = person1_data.copy()
-        
-        train_pairs.append({
-            'person1_data': person1_data,
-            'person2_data': person2_data,
-            'match': bool(row['match'] == 1)
-        })
+# Note: Removed unused and incomplete convert_csv_to_pair_format helper to avoid confusion/errors.
 
 
 def evaluate_baselines_v2(
@@ -643,102 +530,24 @@ def evaluate_baselines_v2(
     print("=" * 70)
     print("\n🎯 Goal: Train on DIFFERENT participants, test on SAME 100 pairs as LLM")
     
-    # Load full dataset
-    df = load_full_dataset(csv_path)
-    
-    # Load test pairs (same as LLM sees)
-    test_personas, test_iids = load_test_pairs(personas_path)
-    
-    # Create training set (excluding test participants)
-    train_df = create_train_test_split(df, test_iids)
-    
-    # Prepare training data from CSV (need to create pairs properly)
-    print("\n📦 Preparing training pairs from CSV...")
-    print("   Creating pairs: matching iid→pid with pid→iid...")
-    
-    X_train_v1 = []
-    X_train_v2 = []
-    y_train = []
-    
-    # Create pairs by matching reciprocal ratings
-    processed_pairs = set()
-    
-    for _, row in train_df.iterrows():
-        iid = row['iid']
-        pid = row['pid']
-        
-        # Skip if missing match label
-        if pd.isna(row['match']) or pd.isna(pid):
-            continue
-        
-        # Avoid processing same pair twice
-        pair_key = tuple(sorted([iid, pid]))
-        if pair_key in processed_pairs:
-            continue
-        
-        # Find the reciprocal row (partner rating this person)
-        partner_row = train_df[(train_df['iid'] == pid) & (train_df['pid'] == iid)]
-        
-        if len(partner_row) == 0:
-            # No reciprocal rating, use single-sided
-            person1_dict = row.to_dict()
-            person2_dict = row.to_dict()  # Fallback: use same features
-        else:
-            person1_dict = row.to_dict()
-            person2_dict = partner_row.iloc[0].to_dict()
-        
-        try:
-            # V1: Time 1 only features
-            features_v1 = BaselineModel(model_type='logistic', feature_mode='v1')._extract_features_v1(
-                person1_dict, person2_dict
-            )
-            X_train_v1.append(features_v1)
-            
-            # V2: Time 1 + Time 2 features
-            features_v2 = BaselineModel(model_type='logistic', feature_mode='v2')._extract_features_v2(
-                person1_dict, person2_dict
-            )
-            X_train_v2.append(features_v2)
-            
-            # Label: match outcome
-            y_train.append(int(row['match']))
-            
-            processed_pairs.add(pair_key)
-        except Exception as e:
-            continue  # Skip pairs with missing data
-    
-    X_train_v1 = np.array(X_train_v1)
-    X_train_v2 = np.array(X_train_v2)
-    y_train = np.array(y_train)
-    
-    # Handle missing values: replace NaN with median
-    from sklearn.impute import SimpleImputer
-    imputer_v1 = SimpleImputer(strategy='median')
-    imputer_v2 = SimpleImputer(strategy='median')
-    
-    X_train_v1 = imputer_v1.fit_transform(X_train_v1)
-    X_train_v2 = imputer_v2.fit_transform(X_train_v2)
-    
-    print(f"   V1 training features: {X_train_v1.shape}")
-    print(f"   V2 training features: {X_train_v2.shape}")
-    print(f"   Training labels: {len(y_train)} (matches: {sum(y_train)})")
-    
-    # Prepare test pairs from personas.json
-    print("\n📦 Preparing test features from personas.json...")
-    test_pairs = []
+    # Load 100 LLM pairs and build a unified dataset of pairs
+    test_personas, _ = load_test_pairs(personas_path)
+
+    print("\n📦 Preparing 30/70 split directly from personas.json (strict parity with LLM)...")
+    all_pairs: List[Dict] = []
     for pair in test_personas:
         person1_data = pair['person1'].get('pre_event_data', {})
         person2_data = pair['person2'].get('pre_event_data', {})
-        
+
         # Merge with time2 data for V2
         time2_p1 = pair['person1'].get('time2_reflection', {})
         time2_p2 = pair['person2'].get('time2_reflection', {})
-        
+
         # Store iids for creating IID-based pair_id
         iid1 = pair['person1']['iid']
         iid2 = pair['person2']['iid']
-        
-        test_pairs.append({
+
+        all_pairs.append({
             'pair_id': pair.get('pair_id'),
             'iid1': iid1,
             'iid2': iid2,
@@ -746,11 +555,53 @@ def evaluate_baselines_v2(
             'person2_data': person2_data,
             'person1_data_full': {**person1_data, **flatten_time2(time2_p1)},
             'person2_data_full': {**person2_data, **flatten_time2(time2_p2)},
-            'match': pair['ground_truth']['match']
+            'match': bool(pair['ground_truth']['match'])
         })
+
+    # Stratified 30/70 split on the 100 pairs
+    pair_labels = [int(p['match']) for p in all_pairs]
+    train_pairs, test_pairs = train_test_split(
+        all_pairs, test_size=0.7, random_state=42, stratify=pair_labels
+    )
+
+    print(f"   Train pairs: {len(train_pairs)} | Test pairs: {len(test_pairs)}")
+    print(f"   Train match rate: {np.mean([p['match'] for p in train_pairs])*100:.1f}% | Test match rate: {np.mean([p['match'] for p in test_pairs])*100:.1f}%")
+
+    # Build training matrices from train_pairs (parity with LLM features)
+    X_train_v1: List[np.ndarray] = []
+    X_train_v2: List[np.ndarray] = []
+    y_train: List[int] = []
+
+    extractor_v1 = BaselineModel(model_type='logistic', feature_mode='v1')
+    extractor_v2 = BaselineModel(model_type='logistic', feature_mode='v2')
+
+    for sample in train_pairs:
+        try:
+            X_train_v1.append(extractor_v1._extract_features_v1(sample['person1_data'], sample['person2_data']))
+            X_train_v2.append(extractor_v2._extract_features_v2(sample['person1_data_full'], sample['person2_data_full']))
+            y_train.append(int(sample['match']))
+        except Exception:
+            # Skip malformed samples
+            continue
+
+    X_train_v1 = np.array(X_train_v1)
+    X_train_v2 = np.array(X_train_v2)
+    y_train = np.array(y_train)
+
+    # Handle missing values: replace NaN with median (fit only on train)
+    from sklearn.impute import SimpleImputer
+    imputer_v1 = SimpleImputer(strategy='median')
+    imputer_v2 = SimpleImputer(strategy='median')
+
+    X_train_v1 = imputer_v1.fit_transform(X_train_v1)
+    X_train_v2 = imputer_v2.fit_transform(X_train_v2)
+
+    print(f"   V1 training features: {X_train_v1.shape}")
+    print(f"   V2 training features: {X_train_v2.shape}")
+    print(f"   Training labels: {len(y_train)} (matches: {sum(y_train)})")
     
-    print(f"   Test set: {len(test_pairs)} pairs")
-    print(f"   Matches: {sum(p['match'] for p in test_pairs)} ({sum(p['match'] for p in test_pairs)/len(test_pairs)*100:.1f}%)")
+    # For convenience in later prints
+    print("\n📦 Preparing test features from personas.json (70%)...")
     
     results = {}
     
@@ -762,72 +613,55 @@ def evaluate_baselines_v2(
         XGBOOST_AVAILABLE = False
         print("\n⚠️  XGBoost not available - will skip XGBoost models")
     
-    # === SIMILARITY BASELINE V1 (Tune threshold on training data) ===
+    # === SIMILARITY BASELINE V1 (Tune threshold on training split) ===
     print("\n" + "=" * 70)
     print("SIMILARITY BASELINE V1: TIME 1 ONLY (Cosine Similarity)")
     print("=" * 70)
     
     print("\n--- SIMILARITY V1 (Tuning threshold on training data) ---")
-    print("   Computing similarities for training pairs...")
-    
-    # Compute similarities on TRAINING data to tune threshold
-    train_similarities_v1 = []
-    train_y = []
-    
-    for _, row in train_df.iterrows():
-        iid = row['iid']
-        pid = row['pid']
-        
-        if pd.isna(row['match']) or pd.isna(pid):
-            continue
-        
-        # Find reciprocal row
-        partner_row = train_df[(train_df['iid'] == pid) & (train_df['pid'] == iid)]
-        
-        if len(partner_row) == 0:
-            continue
-        
+    print("   Computing similarities for training pairs (30%)...")
+
+    # Compute similarities on TRAINING split to tune threshold
+    train_similarities_v1: List[float] = []
+    train_y: List[int] = []
+
+    for pair in train_pairs:
         try:
-            # Extract features from both people
-            row_dict = row.to_dict()
-            partner_dict = partner_row.iloc[0].to_dict()
-            
-            # Preferences (6 features each)
+            p1 = pair['person1_data']
+            p2 = pair['person2_data']
+
+            # Preferences (6 features)
+            prefs1 = p1.get('preferences_self', {})
+            prefs2 = p2.get('preferences_self', {})
+
             vec1 = [
-                row_dict.get('attr1_1', 0), row_dict.get('sinc1_1', 0),
-                row_dict.get('intel1_1', 0), row_dict.get('fun1_1', 0),
-                row_dict.get('amb1_1', 0), row_dict.get('shar1_1', 0)
+                prefs1.get('attractiveness', 0), prefs1.get('sincerity', 0),
+                prefs1.get('intelligence', 0), prefs1.get('fun', 0),
+                prefs1.get('ambition', 0), prefs1.get('shared_interests', 0)
             ]
             vec2 = [
-                partner_dict.get('attr1_1', 0), partner_dict.get('sinc1_1', 0),
-                partner_dict.get('intel1_1', 0), partner_dict.get('fun1_1', 0),
-                partner_dict.get('amb1_1', 0), partner_dict.get('shar1_1', 0)
+                prefs2.get('attractiveness', 0), prefs2.get('sincerity', 0),
+                prefs2.get('intelligence', 0), prefs2.get('fun', 0),
+                prefs2.get('ambition', 0), prefs2.get('shared_interests', 0)
             ]
-            
-            # Add interests (17 features)
+
+            # Interests (17 features)
             interest_keys = ['sports', 'tvsports', 'exercise', 'dining', 'museums', 'art',
-                           'hiking', 'gaming', 'clubbing', 'reading', 'tv', 'theater',
-                           'movies', 'concerts', 'music', 'shopping', 'yoga']
-            
+                             'hiking', 'gaming', 'clubbing', 'reading', 'tv', 'theater',
+                             'movies', 'concerts', 'music', 'shopping', 'yoga']
             for key in interest_keys:
-                vec1.append(row_dict.get(key, 0))
-                vec2.append(partner_dict.get(key, 0))
-            
-            # Cosine similarity
+                vec1.append(p1.get('interests', {}).get(key, 0))
+                vec2.append(p2.get('interests', {}).get(key, 0))
+
             vec1 = np.array(vec1, dtype=float)
             vec2 = np.array(vec2, dtype=float)
-            
             norm1 = np.linalg.norm(vec1)
             norm2 = np.linalg.norm(vec2)
-            
-            if norm1 > 0 and norm2 > 0:
-                similarity = np.dot(vec1, vec2) / (norm1 * norm2)
-            else:
-                similarity = 0.0
-            
+            similarity = np.dot(vec1, vec2) / (norm1 * norm2) if norm1 > 0 and norm2 > 0 else 0.0
+
             train_similarities_v1.append(similarity)
-            train_y.append(int(row['match']))
-        except Exception as e:
+            train_y.append(int(pair['match']))
+        except Exception:
             continue
     
     train_similarities_v1 = np.array(train_similarities_v1)
@@ -850,6 +684,19 @@ def evaluate_baselines_v2(
     
     print(f"   Optimal threshold (from training): {best_threshold_v1:.3f} (F1={best_f1_train:.3f})")
     
+    # Also fit linear calibration on TRAINING similarities
+    k_sim_v1, b_sim_v1 = _fit_linear_calibration(train_similarities_v1, train_y)
+    train_sim_cal_v1 = _apply_calibration(train_similarities_v1, k_sim_v1, b_sim_v1)
+    # Tune threshold on calibrated train
+    best_f1_train_cal = 0.0
+    best_threshold_v1_cal = 0.5
+    for thr in np.linspace(0.05, 0.95, 19):
+        preds_tmp = train_sim_cal_v1 >= thr
+        f1_tmp = f1_score(train_y, preds_tmp, zero_division=0)
+        if f1_tmp > best_f1_train_cal:
+            best_f1_train_cal = f1_tmp
+            best_threshold_v1_cal = float(thr)
+
     # Now apply to TEST data
     print("   Computing similarities for test pairs...")
     
@@ -946,6 +793,33 @@ def evaluate_baselines_v2(
     print(f"  F1 Score:  {results['similarity_v1']['f1']:.3f}")
     print(f"  AUC-ROC:   {results['similarity_v1']['auc']:.3f}")
     print(f"  PR-AUC:    {results['similarity_v1']['pr_auc']:.3f}")
+
+    # Calibrated metrics for SIM V1
+    sim_v1_cal = _apply_calibration(similarities_v1, k_sim_v1, b_sim_v1)
+    predictions_sim_v1_cal = sim_v1_cal >= best_threshold_v1_cal
+    pair_predictions_sim_v1_cal = []
+    for i, pair in enumerate(test_pairs):
+        pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+        pair_predictions_sim_v1_cal.append({
+            'pair_id': pair_id,
+            'probability': float(sim_v1_cal[i]),
+            'prediction': bool(predictions_sim_v1_cal[i]),
+            'ground_truth': bool(pair['match'])
+        })
+    results['similarity_v1_calibrated'] = {
+        'model': 'Similarity V1 (Calibrated)',
+        'feature_mode': 'v1',
+        'calibration': {'k': float(k_sim_v1), 'b': float(b_sim_v1), 'threshold': float(best_threshold_v1_cal)},
+        'accuracy': accuracy_score(y_true, predictions_sim_v1_cal),
+        'precision': precision_score(y_true, predictions_sim_v1_cal, zero_division=0),
+        'recall': recall_score(y_true, predictions_sim_v1_cal, zero_division=0),
+        'f1': f1_score(y_true, predictions_sim_v1_cal, zero_division=0),
+        'auc': roc_auc_score(y_true, sim_v1_cal),
+        'pr_auc': average_precision_score(y_true, sim_v1_cal),
+        'confusion_matrix': confusion_matrix(y_true, predictions_sim_v1_cal).tolist(),
+        'predictions': pair_predictions_sim_v1_cal
+    }
+    print(f"\nCALIBRATED (Similarity V1): Acc={results['similarity_v1_calibrated']['accuracy']:.3f}, F1={results['similarity_v1_calibrated']['f1']:.3f}, AUC={results['similarity_v1_calibrated']['auc']:.3f}")
     
     # === SIMILARITY BASELINE V2 (With Time 2 data, tune on training) ===
     print("\n" + "=" * 70)
@@ -953,77 +827,60 @@ def evaluate_baselines_v2(
     print("=" * 70)
     
     print("\n--- SIMILARITY V2 (Tuning threshold on training data with Time 2) ---")
-    print("   Computing training similarities with Time 2 data...")
-    
-    # Compute similarities on TRAINING data with Time 2 to tune threshold
-    train_similarities_v2 = []
-    train_y_v2 = []
-    
-    for _, row in train_df.iterrows():
-        iid = row['iid']
-        pid = row['pid']
-        
-        if pd.isna(row['match']) or pd.isna(pid):
-            continue
-        
-        # Find reciprocal row
-        partner_row = train_df[(train_df['iid'] == pid) & (train_df['pid'] == iid)]
-        
-        if len(partner_row) == 0:
-            continue
-        
+    print("   Computing training similarities with Time 2 data (30%)...")
+
+    # Compute similarities on TRAIN split with Time 2 to tune threshold
+    train_similarities_v2: List[float] = []
+    train_y_v2: List[int] = []
+
+    for pair in train_pairs:
         try:
-            row_dict = row.to_dict()
-            partner_dict = partner_row.iloc[0].to_dict()
-            
+            p1 = pair['person1_data_full']
+            p2 = pair['person2_data_full']
+
             # Time 1 Preferences (6 features)
+            prefs1 = p1.get('preferences_self', {})
+            prefs2 = p2.get('preferences_self', {})
             vec1 = [
-                row_dict.get('attr1_1', 0), row_dict.get('sinc1_1', 0),
-                row_dict.get('intel1_1', 0), row_dict.get('fun1_1', 0),
-                row_dict.get('amb1_1', 0), row_dict.get('shar1_1', 0)
+                prefs1.get('attractiveness', 0), prefs1.get('sincerity', 0),
+                prefs1.get('intelligence', 0), prefs1.get('fun', 0),
+                prefs1.get('ambition', 0), prefs1.get('shared_interests', 0)
             ]
             vec2 = [
-                partner_dict.get('attr1_1', 0), partner_dict.get('sinc1_1', 0),
-                partner_dict.get('intel1_1', 0), partner_dict.get('fun1_1', 0),
-                partner_dict.get('amb1_1', 0), partner_dict.get('shar1_1', 0)
+                prefs2.get('attractiveness', 0), prefs2.get('sincerity', 0),
+                prefs2.get('intelligence', 0), prefs2.get('fun', 0),
+                prefs2.get('ambition', 0), prefs2.get('shared_interests', 0)
             ]
-            
+
             # Add Time 2 updated preferences (6 features)
             vec1.extend([
-                row_dict.get('attr1_2', 0), row_dict.get('sinc1_2', 0),
-                row_dict.get('intel1_2', 0), row_dict.get('fun1_2', 0),
-                row_dict.get('amb1_2', 0), row_dict.get('shar1_2', 0)
+                p1.get('attr1_2', 0), p1.get('sinc1_2', 0),
+                p1.get('intel1_2', 0), p1.get('fun1_2', 0),
+                p1.get('amb1_2', 0), p1.get('shar1_2', 0)
             ])
             vec2.extend([
-                partner_dict.get('attr1_2', 0), partner_dict.get('sinc1_2', 0),
-                partner_dict.get('intel1_2', 0), partner_dict.get('fun1_2', 0),
-                partner_dict.get('amb1_2', 0), partner_dict.get('shar1_2', 0)
+                p2.get('attr1_2', 0), p2.get('sinc1_2', 0),
+                p2.get('intel1_2', 0), p2.get('fun1_2', 0),
+                p2.get('amb1_2', 0), p2.get('shar1_2', 0)
             ])
-            
-            # Add interests (17 features)
+
+            # Interests (17 features)
             interest_keys = ['sports', 'tvsports', 'exercise', 'dining', 'museums', 'art',
-                           'hiking', 'gaming', 'clubbing', 'reading', 'tv', 'theater',
-                           'movies', 'concerts', 'music', 'shopping', 'yoga']
-            
+                             'hiking', 'gaming', 'clubbing', 'reading', 'tv', 'theater',
+                             'movies', 'concerts', 'music', 'shopping', 'yoga']
             for key in interest_keys:
-                vec1.append(row_dict.get(key, 0))
-                vec2.append(partner_dict.get(key, 0))
-            
-            # Cosine similarity
+                vec1.append(p1.get('interests', {}).get(key, 0))
+                vec2.append(p2.get('interests', {}).get(key, 0))
+
             vec1 = np.array(vec1, dtype=float)
             vec2 = np.array(vec2, dtype=float)
-            
             norm1 = np.linalg.norm(vec1)
             norm2 = np.linalg.norm(vec2)
-            
-            if norm1 > 0 and norm2 > 0:
-                similarity = np.dot(vec1, vec2) / (norm1 * norm2)
-            else:
-                similarity = 0.0
-            
+            similarity = np.dot(vec1, vec2) / (norm1 * norm2) if norm1 > 0 and norm2 > 0 else 0.0
+
             train_similarities_v2.append(similarity)
-            train_y_v2.append(int(row['match']))
-        except Exception as e:
+            train_y_v2.append(int(pair['match']))
+        except Exception:
             continue
     
     train_similarities_v2 = np.array(train_similarities_v2)
@@ -1046,6 +903,18 @@ def evaluate_baselines_v2(
     
     print(f"   Optimal threshold (from training): {best_threshold_v2:.3f} (F1={best_f1_train_v2:.3f})")
     
+    # Also fit linear calibration on TRAINING similarities (with Time 2)
+    k_sim_v2, b_sim_v2 = _fit_linear_calibration(train_similarities_v2, train_y_v2)
+    train_sim_cal_v2 = _apply_calibration(train_similarities_v2, k_sim_v2, b_sim_v2)
+    best_f1_train_v2_cal = 0.0
+    best_threshold_v2_cal = 0.5
+    for thr in np.linspace(0.05, 0.95, 19):
+        preds_tmp = train_sim_cal_v2 >= thr
+        f1_tmp = f1_score(train_y_v2, preds_tmp, zero_division=0)
+        if f1_tmp > best_f1_train_v2_cal:
+            best_f1_train_v2_cal = f1_tmp
+            best_threshold_v2_cal = float(thr)
+
     # Now apply to TEST data
     print("   Computing test similarities with Time 2 data...")
     
@@ -1152,6 +1021,33 @@ def evaluate_baselines_v2(
     print(f"  F1 Score:  {results['similarity_v2']['f1']:.3f}")
     print(f"  AUC-ROC:   {results['similarity_v2']['auc']:.3f}")
     print(f"  PR-AUC:    {results['similarity_v2']['pr_auc']:.3f}")
+
+    # Calibrated metrics for SIM V2
+    sim_v2_cal = _apply_calibration(similarities_v2, k_sim_v2, b_sim_v2)
+    predictions_sim_v2_cal = sim_v2_cal >= best_threshold_v2_cal
+    pair_predictions_sim_v2_cal = []
+    for i, pair in enumerate(test_pairs):
+        pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+        pair_predictions_sim_v2_cal.append({
+            'pair_id': pair_id,
+            'probability': float(sim_v2_cal[i]),
+            'prediction': bool(predictions_sim_v2_cal[i]),
+            'ground_truth': bool(pair['match'])
+        })
+    results['similarity_v2_calibrated'] = {
+        'model': 'Similarity V2 (Calibrated)',
+        'feature_mode': 'v2',
+        'calibration': {'k': float(k_sim_v2), 'b': float(b_sim_v2), 'threshold': float(best_threshold_v2_cal)},
+        'accuracy': accuracy_score(y_true, predictions_sim_v2_cal),
+        'precision': precision_score(y_true, predictions_sim_v2_cal, zero_division=0),
+        'recall': recall_score(y_true, predictions_sim_v2_cal, zero_division=0),
+        'f1': f1_score(y_true, predictions_sim_v2_cal, zero_division=0),
+        'auc': roc_auc_score(y_true, sim_v2_cal),
+        'pr_auc': average_precision_score(y_true, sim_v2_cal),
+        'confusion_matrix': confusion_matrix(y_true, predictions_sim_v2_cal).tolist(),
+        'predictions': pair_predictions_sim_v2_cal
+    }
+    print(f"\nCALIBRATED (Similarity V2): Acc={results['similarity_v2_calibrated']['accuracy']:.3f}, F1={results['similarity_v2_calibrated']['f1']:.3f}, AUC={results['similarity_v2_calibrated']['auc']:.3f}")
     
     # === BASELINE V1: Time 1 Only (Fair with LLM) ===
     print("\n" + "=" * 70)
@@ -1203,18 +1099,27 @@ def evaluate_baselines_v2(
         
         # Apply SMOTE to balance the classes (16.3% → 30% for V1, more conservative)
         if SMOTE_AVAILABLE and model_type != 'logistic':
-            print(f"   Original training: {len(X_train_scaled)} samples ({sum(y_train)} matches, {100*sum(y_train)/len(y_train):.1f}%)")
-            # Use more conservative sampling for Time 1 only
-            smote = SMOTE(sampling_strategy=0.30, random_state=42, k_neighbors=3)  # More conservative
-            X_train_scaled, y_train_smote = smote.fit_resample(X_train_scaled, y_train)
-            print(f"   After SMOTE: {len(X_train_scaled)} samples ({sum(y_train_smote)} matches, {100*sum(y_train_smote)/len(y_train_smote):.1f}%)")
-            print(f"   Training model...")
-            model.fit(X_train_scaled, y_train_smote)
+            pos = int(sum(y_train))
+            neg = int(len(y_train) - pos)
+            minority = min(pos, neg)
+            majority = max(pos, neg)
+            ratio = minority / majority if majority > 0 else 0
+            if majority > 0 and ratio < 0.30:
+                print(f"   Original training: {len(X_train_scaled)} samples ({pos} matches, {100*pos/len(y_train):.1f}%)")
+                # Use more conservative sampling for Time 1 only
+                smote = SMOTE(sampling_strategy=0.30, random_state=42, k_neighbors=3)
+                X_train_scaled, y_train_smote = smote.fit_resample(X_train_scaled, y_train)
+                print(f"   After SMOTE: {len(X_train_scaled)} samples ({sum(y_train_smote)} matches, {100*sum(y_train_smote)/len(y_train_smote):.1f}%)")
+                print(f"   Training model...")
+                model.fit(X_train_scaled, y_train_smote)
+            else:
+                print(f"   Class balance adequate (pos={pos}, neg={neg}); skipping SMOTE")
+                model.fit(X_train_scaled, y_train)
         else:
             print(f"   Training on {len(X_train_scaled)} samples ({sum(y_train)} matches, with balanced class weights)...")
             model.fit(X_train_scaled, y_train)
         
-        # Evaluate on test set (using personas.json)
+    # Evaluate on test set (using personas.json)
         print(f"   Evaluating on {len(test_pairs)} test pairs...")
         predictions_v1 = []
         probs_v1 = []
@@ -1311,6 +1216,48 @@ def evaluate_baselines_v2(
         print(f"  F1 Score:  {results[f'{model_type}_v1']['f1']:.3f}")
         print(f"  AUC-ROC:   {results[f'{model_type}_v1']['auc']:.3f}")
         print(f"  PR-AUC:    {results[f'{model_type}_v1']['pr_auc']:.3f}")
+
+        # ==== Linear calibration on training and apply to test (V1) ====
+        # Compute training probabilities on original training data (no SMOTE applied here)
+        train_probs_v1 = model.predict_proba(X_train_v1 if 'features_scaled' not in locals() else X_train_v1)  # placeholder
+        # But model expects scaled features; reuse scaler
+        train_probs_v1 = model.predict_proba(scaler.transform(X_train_v1))[:, 1]
+        k_v1, b_v1 = _fit_linear_calibration(train_probs_v1, y_train)
+        probs_v1_cal = _apply_calibration(np.array(probs_v1), k_v1, b_v1)
+        # Tune threshold on calibrated train probs
+        best_f1_train_v1_cal = 0.0
+        best_thr_v1_cal = 0.5
+        train_probs_v1_cal = _apply_calibration(train_probs_v1, k_v1, b_v1)
+        for thr in np.linspace(0.05, 0.95, 19):
+            preds_tmp = (train_probs_v1_cal >= thr)
+            f1_tmp = f1_score(y_train, preds_tmp, zero_division=0)
+            if f1_tmp > best_f1_train_v1_cal:
+                best_f1_train_v1_cal = f1_tmp
+                best_thr_v1_cal = float(thr)
+        preds_v1_cal = (probs_v1_cal >= best_thr_v1_cal)
+        pair_predictions_v1_cal = []
+        for i, pair in enumerate(test_pairs):
+            pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+            pair_predictions_v1_cal.append({
+                'pair_id': pair_id,
+                'probability': float(probs_v1_cal[i]),
+                'prediction': bool(preds_v1_cal[i]),
+                'ground_truth': bool(pair['match'])
+            })
+        results[f'{model_type}_v1_calibrated'] = {
+            'model': f'{model_type} V1 (Calibrated)',
+            'feature_mode': 'v1',
+            'calibration': {'k': float(k_v1), 'b': float(b_v1), 'threshold': float(best_thr_v1_cal)},
+            'accuracy': accuracy_score(y_true, preds_v1_cal),
+            'precision': precision_score(y_true, preds_v1_cal, zero_division=0),
+            'recall': recall_score(y_true, preds_v1_cal, zero_division=0),
+            'f1': f1_score(y_true, preds_v1_cal, zero_division=0),
+            'auc': roc_auc_score(y_true, probs_v1_cal),
+            'pr_auc': average_precision_score(y_true, probs_v1_cal),
+            'confusion_matrix': confusion_matrix(y_true, preds_v1_cal).tolist(),
+            'predictions': pair_predictions_v1_cal
+        }
+        print(f"  CALIBRATED ({model_type} V1): Acc={results[f'{model_type}_v1_calibrated']['accuracy']:.3f}, F1={results[f'{model_type}_v1_calibrated']['f1']:.3f}, AUC={results[f'{model_type}_v1_calibrated']['auc']:.3f}")
     
     # === BASELINE V2: Time 1 + Time 2 (With Future Knowledge) ===
     print("\n" + "=" * 70)
@@ -1354,17 +1301,26 @@ def evaluate_baselines_v2(
         
         # Apply SMOTE to balance the classes (16.3% → 40%)
         if SMOTE_AVAILABLE and model_type != 'logistic':
-            print(f"   Original training: {len(X_train_scaled)} samples ({sum(y_train)} matches)")
-            smote = SMOTE(sampling_strategy=0.4, random_state=42)  # Increase matches to 40% (not 50% to avoid overfitting)
-            X_train_scaled, y_train_smote = smote.fit_resample(X_train_scaled, y_train)
-            print(f"   After SMOTE: {len(X_train_scaled)} samples ({sum(y_train_smote)} matches)")
-            print(f"   Training model...")
-            model.fit(X_train_scaled, y_train_smote)
+            pos = int(sum(y_train))
+            neg = int(len(y_train) - pos)
+            minority = min(pos, neg)
+            majority = max(pos, neg)
+            ratio = minority / majority if majority > 0 else 0
+            if majority > 0 and ratio < 0.40:
+                print(f"   Original training: {len(X_train_scaled)} samples ({pos} matches)")
+                smote = SMOTE(sampling_strategy=0.4, random_state=42)
+                X_train_scaled, y_train_smote = smote.fit_resample(X_train_scaled, y_train)
+                print(f"   After SMOTE: {len(X_train_scaled)} samples ({sum(y_train_smote)} matches)")
+                print(f"   Training model...")
+                model.fit(X_train_scaled, y_train_smote)
+            else:
+                print(f"   Class balance adequate (pos={pos}, neg={neg}); skipping SMOTE")
+                model.fit(X_train_scaled, y_train)
         else:
             print(f"   Training on {len(X_train_scaled)} samples (with balanced class weights)...")
             model.fit(X_train_scaled, y_train)
         
-        # Evaluate on test set (using personas.json with Time 2)
+    # Evaluate on test set (using personas.json with Time 2)
         print(f"   Evaluating on {len(test_pairs)} test pairs...")
         predictions_v2 = []
         probs_v2 = []
@@ -1456,6 +1412,45 @@ def evaluate_baselines_v2(
         print(f"  F1 Score:  {results[f'{model_type}_v2']['f1']:.3f}")
         print(f"  AUC-ROC:   {results[f'{model_type}_v2']['auc']:.3f}")
         print(f"  PR-AUC:    {results[f'{model_type}_v2']['pr_auc']:.3f}")
+
+        # ==== Linear calibration on training and apply to test (V2) ====
+        train_probs_v2 = model.predict_proba(scaler.transform(X_train_v2))[:, 1]
+        k_v2, b_v2 = _fit_linear_calibration(train_probs_v2, y_train)
+        probs_v2_cal = _apply_calibration(np.array(probs_v2), k_v2, b_v2)
+        # Tune threshold on calibrated train probs
+        best_f1_train_v2_cal = 0.0
+        best_thr_v2_cal = 0.5
+        train_probs_v2_cal = _apply_calibration(train_probs_v2, k_v2, b_v2)
+        for thr in np.linspace(0.05, 0.95, 19):
+            preds_tmp = (train_probs_v2_cal >= thr)
+            f1_tmp = f1_score(y_train, preds_tmp, zero_division=0)
+            if f1_tmp > best_f1_train_v2_cal:
+                best_f1_train_v2_cal = f1_tmp
+                best_thr_v2_cal = float(thr)
+        preds_v2_cal = (probs_v2_cal >= best_thr_v2_cal)
+        pair_predictions_v2_cal = []
+        for i, pair in enumerate(test_pairs):
+            pair_id = f"pair_{pair['iid1']}_{pair['iid2']}"
+            pair_predictions_v2_cal.append({
+                'pair_id': pair_id,
+                'probability': float(probs_v2_cal[i]),
+                'prediction': bool(preds_v2_cal[i]),
+                'ground_truth': bool(pair['match'])
+            })
+        results[f'{model_type}_v2_calibrated'] = {
+            'model': f'{model_type} V2 (Calibrated)',
+            'feature_mode': 'v2',
+            'calibration': {'k': float(k_v2), 'b': float(b_v2), 'threshold': float(best_thr_v2_cal)},
+            'accuracy': accuracy_score(y_true, preds_v2_cal),
+            'precision': precision_score(y_true, preds_v2_cal, zero_division=0),
+            'recall': recall_score(y_true, preds_v2_cal, zero_division=0),
+            'f1': f1_score(y_true, preds_v2_cal, zero_division=0),
+            'auc': roc_auc_score(y_true, probs_v2_cal),
+            'pr_auc': average_precision_score(y_true, probs_v2_cal),
+            'confusion_matrix': confusion_matrix(y_true, preds_v2_cal).tolist(),
+            'predictions': pair_predictions_v2_cal
+        }
+        print(f"  CALIBRATED ({model_type} V2): Acc={results[f'{model_type}_v2_calibrated']['accuracy']:.3f}, F1={results[f'{model_type}_v2_calibrated']['f1']:.3f}, AUC={results[f'{model_type}_v2_calibrated']['auc']:.3f}")
     
     # Summary
     print("\n" + "=" * 70)

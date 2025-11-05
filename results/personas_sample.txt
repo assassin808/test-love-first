@@ -5,43 +5,11 @@ Ground Truth: MATCHED
 
 --- PERSON 1 (iid=467) ---
 
-I'm a 24-year-old woman studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm European/Caucasian-American. 
-
-In my daily life, I go out several times a week, though I only go on dates twice a week. I came to this speed dating event to other reasons. I have quite high expectations for tonight. 
-
-Sharing the same race is quite important to me in dating. Sharing the same religion is somewhat important to me in dating. 
-
-What I value in a potential date: attractiveness (most important), sincerity, intelligence, fun, ambition, shared interests (least important). 
-
-What I think the opposite sex looks for: attractiveness (most important), intelligence, fun, sincerity, ambition, shared interests (least important). 
-
-What I think my same sex looks for: attractiveness (most important), intelligence, fun, sincerity, ambition, shared interests (least important). 
-
-How I rate myself: attractiveness (quite high), sincerity (quite high), intelligence (quite high), fun (quite high), ambition (quite high). How I expect others would rate me: attractiveness (quite high), sincerity (quite high), intelligence (quite high), ambition (quite high), fun (quite high). 
-
-My interests and how much I enjoy them: playing sports/athletics (quite high interest), watching sports (somewhat low interest), exercising/bodybuilding (very high interest), dining out (very high interest), visiting museums/galleries (very high interest), art (very high interest), hiking/camping (quite high interest), gaming (moderate interest), dancing/clubbing (quite high interest), reading (very high interest), watching TV (quite high interest), theater (very high interest), movies (very high interest), concerts (very high interest), music (very high interest), shopping (very high interest), yoga/meditation (very high interest). 
-
-I'm here with an open heart, curious to see who I'll meet and what connections might form.
+I'm a twenty-four-year-old woman, and I'm currently in consulting, which feels like a strong fit for me. When it comes to my free time, I'm extremely active; I love sports and exercise, and hiking is also a considerable passion. I'm also very much into culture and experiences – dining out, visiting museums, appreciating art, going to the theater, catching movies, and attending concerts are all things I enjoy immensely. Music is a huge part of my life, and I also find shopping to be a very pleasant activity. Yoga is something I'm very dedicated to as well. I'm fairly into gaming, and while I enjoy watching sports moderately, I'm much more involved in playing them. I also enjoy clubbing quite a bit and reading is something I'm very passionate about, as is watching TV. Overall, I'd say I'm an extremely fun person to be around. When I think about a partner, I'm looking for someone who brings a balanced mix of attractiveness, sincerity, intelligence, fun, and ambition to the table. Shared interests are not a primary concern for me.
 
 --- PERSON 2 (iid=492) ---
 
-I'm a 30-year-old man studying Biological Sciences/Chemistry/Physics, with plans to become a Academic/Researcher. I'm Other. 
-
-In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. I have quite high expectations for tonight. 
-
-Sharing the same race is not at all important to me in dating. Sharing the same religion is not at all important to me in dating. 
-
-What I value in a potential date: attractiveness (most important), intelligence, fun, ambition, sincerity, shared interests (least important). 
-
-What I think the opposite sex looks for: sincerity (most important), intelligence, ambition, shared interests, attractiveness, fun (least important). 
-
-What I think my same sex looks for: attractiveness (most important), intelligence, fun, sincerity, ambition, shared interests (least important). 
-
-How I rate myself: attractiveness (very high), sincerity (very high), intelligence (very high), fun (very high), ambition (very high). How I expect others would rate me: attractiveness (very high), sincerity (very high), intelligence (very high), fun (very high), ambition (very high). 
-
-My interests and how much I enjoy them: playing sports/athletics (very high interest), watching sports (very high interest), exercising/bodybuilding (very high interest), dining out (very high interest), visiting museums/galleries (very high interest), art (very high interest), hiking/camping (very high interest), gaming (very low interest), dancing/clubbing (somewhat low interest), reading (very high interest), watching TV (quite high interest), theater (moderate interest), movies (moderate interest), concerts (very low interest), music (moderate interest), shopping (very high interest), yoga/meditation (very high interest). 
-
-I'm here with an open heart, curious to see who I'll meet and what connections might form.
+I'm a thirty-year-old woman, and I've spent my academic life immersed in physics. When it comes to my interests, I'm extremely passionate about a lot of things! I absolutely love sports and watching them, and staying active with exercise is a huge part of my life. I also really enjoy dining out, exploring museums, appreciating art, hiking, reading, shopping, and practicing yoga. On the other hand, gaming and going to concerts are things I barely engage in. Clubbing is a moderate interest for me, and I find myself quite interested in watching TV. Theater, movies, and music are all reasonably appealing to me. Overall, I think I'm a very fun person to be around. When I think about a partner, I place a high value on attractiveness, intelligence, and a sense of fun. Ambition is also quite important to me, but sincerity and shared interests are things I don't prioritize as much.
 
 
 ================================================================================
@@ -51,43 +19,11 @@ Ground Truth: MATCHED
 
 --- PERSON 1 (iid=263) ---
 
-I'm a 26-year-old woman studying Social Science/Psychology, with plans to become a Undecided. I'm Black/African American. 
-
-In my daily life, I go out twice a week, though I only go on dates several times a year. I came to this speed dating event to have a fun night out. I have very low expectations for tonight. 
-
-Sharing the same race is extremely important to me in dating. Sharing the same religion is extremely important to me in dating. 
-
-What I value in a potential date: attractiveness (most important), sincerity, intelligence, ambition, fun, shared interests (least important). 
-
-What I think the opposite sex looks for: attractiveness (most important), sincerity, intelligence, fun, ambition, shared interests (least important). 
-
-What I think my same sex looks for: sincerity (most important), intelligence, ambition, attractiveness, fun, shared interests (least important). 
-
-How I rate myself: attractiveness (quite high), sincerity (quite high), intelligence (quite high), fun (quite high), ambition (moderate). How I expect others would rate me: intelligence (very high), fun (very high), attractiveness (quite high), ambition (quite high), sincerity (quite high). 
-
-My interests and how much I enjoy them: playing sports/athletics (very low interest), watching sports (very low interest), exercising/bodybuilding (very low interest), dining out (moderate interest), visiting museums/galleries (quite high interest), art (quite high interest), hiking/camping (quite high interest), gaming (very low interest), dancing/clubbing (somewhat low interest), reading (very high interest), watching TV (somewhat low interest), theater (quite high interest), movies (quite high interest), concerts (quite high interest), music (quite high interest), shopping (very high interest), yoga/meditation (moderate interest). 
-
-I'm here with an open heart, curious to see who I'll meet and what connections might form.
+I'm a Psychology major who is now pursuing a career. I have minimal interest in sports of any kind, whether playing, watching, or exercising. Dining out is an average interest for me, but I'm quite drawn to museums, art, hiking, theater, movies, and concerts. Gaming is barely on my radar, and I have only mild interest in clubbing, but I'm extremely into reading and highly enjoy shopping. I have a moderate interest in watching TV, and I'm quite passionate about music. Yoga is something I find fairly engaging. Overall, I think I'm a very fun person, and when it comes to a partner, I value attractiveness, sincerity, intellect, and ambition quite highly, with fun and shared interests being somewhat important as well.
 
 --- PERSON 2 (iid=274) ---
 
-I'm a 24-year-old man studying Social Science/Psychology, with plans to become a Academic/Researcher. I'm Latino/Hispanic American. 
-
-In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to get a date. I have moderate expectations for tonight. 
-
-Sharing the same race is somewhat important to me in dating. Sharing the same religion is somewhat important to me in dating. 
-
-What I value in a potential date: attractiveness (most important), intelligence, fun, sincerity, ambition, shared interests (least important). 
-
-What I think the opposite sex looks for: intelligence (most important), fun, ambition, attractiveness, sincerity, shared interests (least important). 
-
-What I think my same sex looks for: attractiveness (most important), fun, intelligence, ambition, sincerity, shared interests (least important). 
-
-How I rate myself: fun (very high), intelligence (very high), ambition (very high), attractiveness (quite high), sincerity (quite high). How I expect others would rate me: intelligence (very high), fun (very high), sincerity (quite high), ambition (quite high), attractiveness (quite high). 
-
-My interests and how much I enjoy them: playing sports/athletics (somewhat low interest), watching sports (somewhat low interest), exercising/bodybuilding (somewhat low interest), dining out (quite high interest), visiting museums/galleries (moderate interest), art (moderate interest), hiking/camping (somewhat low interest), gaming (moderate interest), dancing/clubbing (very low interest), reading (very high interest), watching TV (quite high interest), theater (moderate interest), movies (quite high interest), concerts (very high interest), music (very high interest), shopping (quite high interest), yoga/meditation (quite high interest). 
-
-I'm open to seeing where things lead. If I meet someone interesting, I'd definitely want to get to know them better.
+I'm a twenty-four-year-old woman, currently studying Sociology, and I'm somewhat established in my career. When it comes to my free time, I have a mild interest in sports, including watching them, and I find exercising to be a moderate activity for me. I really enjoy dining out and have a fair appreciation for museums and art. Hiking is something I moderately enjoy, and gaming is also a fairly engaging pastime. Clubbing is barely on my radar, but I'm extremely passionate about reading and music. I also quite enjoy watching TV and have a strong love for movies. Going to the theater is something I fairly like, and concerts are something I'm very keen on. Shopping is another strong interest of mine, and I quite enjoy yoga. Overall, I'd say I'm a very fun person to be around. When it comes to what I'm looking for in a partner, I value attractiveness to some extent, but sincerity is extremely important to me, as are intelligence and a fun personality. Ambition and shared interests are also quite important.
 
 
 ================================================================================
@@ -97,42 +33,10 @@ Ground Truth: MATCHED
 
 --- PERSON 1 (iid=241) ---
 
-I'm a 29-year-old woman studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm Asian/Pacific Islander/Asian-American. 
-
-In my daily life, I go out twice a week, though I only go on dates twice a month. I came to this speed dating event to meet new people. I have very low expectations for tonight. 
-
-Sharing the same race is not at all important to me in dating. Sharing the same religion is not at all important to me in dating. 
-
-What I value in a potential date: attractiveness (most important), sincerity, intelligence, fun, ambition, shared interests (least important). 
-
-What I think the opposite sex looks for: attractiveness (most important), sincerity, shared interests, fun, intelligence, ambition (least important). 
-
-What I think my same sex looks for: sincerity (most important), attractiveness, intelligence, shared interests, fun, ambition (least important). 
-
-How I rate myself: sincerity (very high), attractiveness (quite high), intelligence (quite high), fun (quite high), ambition (quite high). How I expect others would rate me: sincerity (very high), attractiveness (quite high), intelligence (quite high), fun (quite high), ambition (quite high). 
-
-My interests and how much I enjoy them: playing sports/athletics (quite high interest), watching sports (very low interest), exercising/bodybuilding (moderate interest), dining out (quite high interest), visiting museums/galleries (quite high interest), art (quite high interest), hiking/camping (somewhat low interest), gaming (very low interest), dancing/clubbing (somewhat low interest), reading (somewhat low interest), watching TV (very low interest), theater (somewhat low interest), movies (somewhat low interest), concerts (moderate interest), music (quite high interest), shopping (moderate interest), yoga/meditation (somewhat low interest). 
-
-I'm here with an open heart, curious to see who I'll meet and what connections might form.
+I'm a woman in my late twenties, working in business, which I find to be quite fulfilling. When it comes to my free time, I'm really into sports, though I'm not one to sit around watching them on TV at all. I also enjoy getting some exercise, and I have a strong appreciation for dining out, exploring museums, and art. Hiking is something I moderately enjoy, but you won't catch me gaming or watching much TV. Clubbing and theater are mild interests of mine, as is reading and going to the movies. I find concerts and shopping to be reasonably enjoyable, and music is a considerable passion. Yoga is something I'm mildly interested in. Overall, I'd say I'm quite a fun person, and when it comes to a partner, I'm extremely focused on physical attraction, with sincerity, intelligence, a sense of fun, ambition, and shared interests being only slightly important.
 
 --- PERSON 2 (iid=248) ---
 
-I'm a 27-year-old man studying Business/Economics/Finance, with plans to become a Banking/Consulting/Finance/Business. I'm Other. 
-
-In my daily life, I go out several times a week, though I only go on dates twice a month. I came to this speed dating event to have a fun night out. I have moderate expectations for tonight. 
-
-Sharing the same race is not at all important to me in dating. Sharing the same religion is not at all important to me in dating. 
-
-What I value in a potential date: attractiveness (most important), intelligence, fun, sincerity, ambition, shared interests (least important). 
-
-What I think the opposite sex looks for: fun (most important), attractiveness, ambition, sincerity, intelligence, shared interests (least important). 
-
-What I think my same sex looks for: attractiveness (most important), fun, intelligence, shared interests, sincerity, ambition (least important). 
-
-How I rate myself: intelligence (quite high), fun (quite high), ambition (quite high), sincerity (moderate), attractiveness (moderate). How I expect others would rate me: sincerity (quite high), fun (quite high), ambition (quite high), intelligence (moderate), attractiveness (moderate). 
-
-My interests and how much I enjoy them: playing sports/athletics (quite high interest), watching sports (very low interest), exercising/bodybuilding (quite high interest), dining out (quite high interest), visiting museums/galleries (moderate interest), art (very low interest), hiking/camping (quite high interest), gaming (moderate interest), dancing/clubbing (quite high interest), reading (moderate interest), watching TV (somewhat low interest), theater (quite high interest), movies (quite high interest), concerts (somewhat low interest), music (quite high interest), shopping (moderate interest), yoga/meditation (very low interest). 
-
-I'm here with an open heart, curious to see who I'll meet and what connections might form.
+I'm a young professional, a woman who studied Business, and I'm quite established in my career. When it comes to my free time, I'm quite into sports, though I barely watch them on TV. Exercise is a strong interest of mine, and I also really enjoy dining out, hiking, and clubbing. I'm fairly interested in museums, gaming, reading, movies, theater, music, and shopping. My interest in TV is moderate, and I have a mild interest in concerts, but I have a minimal interest in art or yoga. I'd say I'm a reasonably fun person. When it comes to what I look for in a partner, I place a very high value on attractiveness, followed by strong importance on intellect and fun. Sincerity and ambition are also quite important to me, while shared interests are only slightly important.
 
 

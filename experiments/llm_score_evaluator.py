@@ -14,7 +14,7 @@ import re
 import sys
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 import numpy as np
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
@@ -61,14 +61,15 @@ if os.getenv('OPENROUTER_API_KEY') is None:
     _load_env_fallback()
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "mistralai/mistral-nemo"
+# Default model (can be overridden per-role via CLI args)
+DEFAULT_MODEL = "mistralai/mistral-nemo"
 
 if not OPENROUTER_API_KEY:
     print("❌ Error: OPENROUTER_API_KEY not found in environment variables")
     print("Please set it in .env file or environment")
     sys.exit(1)
 
-def call_openrouter_api(messages: List[Dict], temperature: float = 0.3, max_retries: int = 10, max_tokens: int = 300, repetition_penalty: float = 1.0) -> str:
+def call_openrouter_api(messages: List[Dict], temperature: float = 0.6, max_retries: int = 10, max_tokens: int = 300, repetition_penalty: float = 1.0, model: str = None) -> str:
     """
     调用 OpenRouter API with robust retry and exponential backoff
     
@@ -92,7 +93,7 @@ def call_openrouter_api(messages: List[Dict], temperature: float = 0.3, max_retr
     }
     
     payload = {
-        "model": MODEL,
+        "model": (model or DEFAULT_MODEL),
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens
@@ -103,10 +104,10 @@ def call_openrouter_api(messages: List[Dict], temperature: float = 0.3, max_retr
         payload["repetition_penalty"] = repetition_penalty
     
     # Debug: Print API parameters on first attempt
-    if max_tokens == 300 and repetition_penalty == 1.0:
-        print(f"      [API] model={MODEL}, temp={temperature}, max_tokens={max_tokens}")
-    elif repetition_penalty != 1.0:
-        print(f"      [API] model={MODEL}, temp={temperature}, max_tokens={max_tokens}, rep_penalty={repetition_penalty}")
+    if repetition_penalty == 1.0:
+        print(f"      [API] model={(model or DEFAULT_MODEL)}, temp={temperature}, max_tokens={max_tokens}")
+    else:
+        print(f"      [API] model={(model or DEFAULT_MODEL)}, temp={temperature}, max_tokens={max_tokens}, rep_penalty={repetition_penalty}")
     
     for attempt in range(max_retries):
         try:
@@ -183,7 +184,76 @@ def extract_score_from_response(response: str, score_type: str = "participant") 
     return None
 
 
-def call_api_with_score_extraction(messages: List[Dict], temperature: float = 0.3, score_type: str = "participant") -> float:
+def parse_observer_metrics(response: str) -> Dict[str, float] | None:
+    """
+    Try to parse six observer dimension scores from the model response.
+    Prefers strict JSON object with keys:
+      - interest_value_alignment
+      - personality_compatibility
+      - communication_quality
+      - mutual_attraction_chemistry
+      - reciprocity_balance
+      - long_term_potential
+    Falls back to label-based regex extraction if JSON parse fails.
+    Returns dict with floats 0-10 or None if not all six found.
+    """
+    keys = [
+        "interest_value_alignment",
+        "personality_compatibility",
+        "communication_quality",
+        "mutual_attraction_chemistry",
+        "reciprocity_balance",
+        "long_term_potential",
+    ]
+
+    # 1) Try to locate and parse JSON object (optionally inside code fences)
+    try:
+        text = response.strip()
+        # If fenced in ```json ... ``` or ``` ... ``` extract inner
+        import re as _re
+        m = _re.search(r"```(?:json)?\s*({[\s\S]*?})\s*```", text, _re.IGNORECASE)
+        if m:
+            text = m.group(1)
+        obj = json.loads(text)
+        if isinstance(obj, dict):
+            vals = {}
+            for k in keys:
+                if k in obj and isinstance(obj[k], (int, float)):
+                    v = float(obj[k])
+                    if 0 <= v <= 10:
+                        vals[k] = v
+            if len(vals) == 6:
+                return vals
+    except Exception:
+        pass
+
+    # 2) Regex fallback: match lines like "Interest & Value Alignment: X.X/10" or "INTEREST_VALUE_ALIGNMENT: X.X"
+    import re as _re2
+    patterns = {
+        "interest_value_alignment": r"interest[\s_&]*value[\s_]*alignment\s*[:=]\s*(\d+(?:\.\d+)?)",
+        "personality_compatibility": r"personality[\s_]*compatibility\s*[:=]\s*(\d+(?:\.\d+)?)",
+        "communication_quality": r"communication[\s_]*quality\s*[:=]\s*(\d+(?:\.\d+)?)",
+        "mutual_attraction_chemistry": r"(mutual[\s_]*attraction|chemistry|attraction[\s_]*&[\s_]*chemistry)\s*[:=]\s*(\d+(?:\.\d+)?)",
+        "reciprocity_balance": r"reciprocity[\s_]*&?[\s_]*balance\s*[:=]\s*(\d+(?:\.\d+)?)",
+        "long_term_potential": r"long[\s_]*-?[\s_]*term[\s_]*potential\s*[:=]\s*(\d+(?:\.\d+)?)",
+    }
+    found: Dict[str, float] = {}
+    low = response.lower()
+    for k, pat in patterns.items():
+        m = _re2.search(pat, low, _re2.IGNORECASE)
+        if m:
+            try:
+                v = float(m.group(1)) if m.lastindex == 1 else float(m.group(m.lastindex))
+                if 0 <= v <= 10:
+                    found[k] = v
+            except Exception:
+                continue
+    if len(found) == 6:
+        return found
+    return None
+
+
+def call_api_with_score_extraction(messages: List[Dict], temperature: float = 0.6, score_type: str = "participant", model: str = None) -> Dict[str, Any]:
     """
     调用API并提取评分，如果失败则用更长的token和更高的repetition penalty重试
     
@@ -192,31 +262,37 @@ def call_api_with_score_extraction(messages: List[Dict], temperature: float = 0.
         temperature: 温度参数
         score_type: 评分类型 ("participant" 或 "observer")
     
-    Returns:
-        0-10之间的分数
+        Returns:
+                dict with keys:
+                    - 'score': float in [0,10] (computed weighted average when metrics are provided)
+                    - 'raw': str full model response
+                    - 'metrics': Optional[Dict[str, float]] six-dimension scores if parsed
     
     Raises:
         ValueError: 如果所有尝试都无法提取有效评分
     """
     # Progressive strategies: (max_tokens, repetition_penalty)
-    # 1st: Normal (300 tokens, no penalty)
-    # 2nd: More tokens (500 tokens, no penalty)
-    # 3rd: More tokens + penalty (800 tokens, 1.1 penalty)
-    # 4th: Strong penalty (800 tokens, 1.2 penalty)
+    # Updated for multi-dimensional Observer responses (need more tokens for 6 dimensions + reasoning)
+    # 1st: Large tokens for full response (800 tokens, no penalty)
+    # 2nd: Even more tokens (1000 tokens, no penalty)  
+    # 3rd: Max tokens + penalty (1200 tokens, 1.5 penalty)
+    # 4th: Strong penalty (1200 tokens, 2.0 penalty)
     strategies = [
-        (300, 1.0),
-        (500, 1.0),
-        (800, 1.5),
-        (800, 2.0)
+        (800, 1.0),
+        (1000, 1.0),
+        (1200, 1.5),
+        (1200, 2.0)
     ]
     
+    last_raw_response = ""
     for attempt, (max_tokens, rep_penalty) in enumerate(strategies):
         if rep_penalty == 1.0:
             print(f"   Attempt {attempt + 1}/{len(strategies)} with max_tokens={max_tokens}...")
         else:
             print(f"   Attempt {attempt + 1}/{len(strategies)} with max_tokens={max_tokens}, repetition_penalty={rep_penalty}...")
         
-        response = call_openrouter_api(messages, temperature=temperature, max_tokens=max_tokens, repetition_penalty=rep_penalty)
+        response = call_openrouter_api(messages, temperature=temperature, max_tokens=max_tokens, repetition_penalty=rep_penalty, model=model)
+        last_raw_response = response
         
         # Check for API errors
         if response.startswith("[API Error:") or response.startswith("[Error:"):
@@ -238,8 +314,25 @@ def call_api_with_score_extraction(messages: List[Dict], temperature: float = 0.
                     is_repetitive = True
                     break
         
-        # Try to extract score
-        score = extract_score_from_response(response, score_type)
+        # For observer, try to extract six metrics first, then compute weighted average
+        score = None
+        metrics = None
+        if score_type == "observer":
+            metrics = parse_observer_metrics(response)
+            if metrics:
+                # Weighted average per earlier design: 20,15,25,20,10,10
+                w = {
+                    'interest_value_alignment': 0.20,
+                    'personality_compatibility': 0.15,
+                    'communication_quality': 0.25,
+                    'mutual_attraction_chemistry': 0.20,
+                    'reciprocity_balance': 0.10,
+                    'long_term_potential': 0.10,
+                }
+                score = sum(metrics[k] * w[k] for k in w)
+        # Fallback: extract any single score line
+        if score is None:
+            score = extract_score_from_response(response, score_type)
         
         # If repetitive pattern detected and no valid score, force retry with stronger penalty
         if is_repetitive and score is None:
@@ -250,7 +343,10 @@ def call_api_with_score_extraction(messages: List[Dict], temperature: float = 0.
         if score is not None:
             if attempt > 0:
                 print(f"   ✅ Successfully extracted score on attempt {attempt + 1}")
-            return score
+            pack = {"score": score, "raw": response}
+            if metrics:
+                pack["metrics"] = metrics
+            return pack
         else:
             if attempt < len(strategies) - 1:
                 print(f"   ⚠️ Could not extract score from response, trying next strategy...")
@@ -363,13 +459,63 @@ def build_observer_messages(person1_data: Dict, person2_data: Dict, conversation
             conversation_lines.append(f"{speaker}: {text}")
     conversation_text = "\n".join(conversation_lines)
     
-    # Build system prompt
+    # Build system prompt with multi-dimensional evaluation based on relationship science
     system_content = (
-        "You are an experienced relationship observer. Reply in English. "
-        "Output format and order:\n"
-        "1) Provide 2-3 concise sentences explaining your assessment considering values/interests alignment, conversational flow, mutual attraction/chemistry, and long-term potential.\n"
-        "2) Then include one line specifying the rubric: 'Rubric: 0 = absolutely unwilling to meet again (no chemistry, clear misalignment, or red flags); 5 = indifferent — could meet or not (could take it or leave it); 10 = perfect match, nothing can break them! (strong chemistry, aligned values/interests, clear mutual interest)'.\n"
-        "3) On a new separate line at the very end, write exactly: 'Score: X.X/10' where X.X can be any decimal (e.g., 4.3)."
+        "You are an expert relationship psychologist evaluating romantic compatibility based on established theories:\n"
+        "- Similarity-Attraction Theory: shared interests and values\n"
+        "- Social Exchange Theory: balanced reciprocity\n"
+        "- Attachment Theory: communication quality and emotional connection\n"
+        "- Personality Compatibility: complementary and similar traits\n"
+        "- Chemistry: mutual attraction and engagement\n"
+        "- Future Potential: aligned life goals and lifestyle\n\n"
+        
+        "Evaluate the couple on SIX dimensions (0-10 each):\n\n"
+        
+        "1. INTEREST & VALUE ALIGNMENT (0-10)\n"
+        "   - Shared hobbies, activities, interests\n"
+        "   - Similar attitudes toward key life domains\n"
+        "   - Common ground for shared experiences\n\n"
+        
+        "2. PERSONALITY COMPATIBILITY (0-10)\n"
+        "   - Complementary traits (e.g., outgoing vs. reserved)\n"
+        "   - Similarity on core values (honesty, ambition, fun)\n"
+        "   - Emotional maturity match\n\n"
+        
+        "3. COMMUNICATION QUALITY (0-10)\n"
+        "   - Natural conversational flow\n"
+        "   - Active listening and engagement\n"
+        "   - Depth of discussion topics\n"
+        "   - Humor compatibility\n\n"
+        
+        "4. MUTUAL ATTRACTION & CHEMISTRY (0-10)\n"
+        "   - Both parties show genuine interest\n"
+        "   - Positive signals and enthusiasm\n"
+        "   - Balanced (not one-sided)\n"
+        "   - Flirting and connection cues\n\n"
+        
+        "5. RECIPROCITY & BALANCE (0-10)\n"
+        "   - Equal investment in conversation\n"
+        "   - Both ask questions and share\n"
+        "   - Neither dominates nor withdraws\n"
+        "   - Fair give-and-take dynamic\n\n"
+        
+        "6. LONG-TERM POTENTIAL (0-10)\n"
+        "   - Compatible life goals (career, family)\n"
+        "   - Similar lifestyle preferences\n"
+        "   - Age-appropriate match\n"
+        "   - Realistic future together\n\n"
+        
+        "STRICT OUTPUT REQUIREMENT:\n"
+        "Return ONLY a JSON object with exactly these keys (numbers 0-10, one decimal):\n"
+        "{\n"
+        "  \"interest_value_alignment\": X.X,\n"
+        "  \"personality_compatibility\": X.X,\n"
+        "  \"communication_quality\": X.X,\n"
+        "  \"mutual_attraction_chemistry\": X.X,\n"
+        "  \"reciprocity_balance\": X.X,\n"
+        "  \"long_term_potential\": X.X\n"
+        "}\n\n"
+        "Do not include any other text, explanation, rubric, or final score."
     )
     
     # Add in-context learning examples if provided
@@ -400,33 +546,89 @@ def build_observer_messages(person1_data: Dict, person2_data: Dict, conversation
             f"Person 1 background: {p1}\n\n"
             f"Person 2 background: {p2}\n\n"
             f"Conversation transcript:\n{conversation_text}\n\n"
-            "Now, rate the overall match quality on a 0-10 scale. "
-            "Follow the required order: reasoning (2-3 sentences), then the rubric line, and finally the last line 'Score: X.X/10' (decimals allowed, e.g., 4.3)."
+            "Based on the above, output ONLY the requested JSON object with the six metric scores (0-10)."
         )}
     ]
     return msgs
 
 
-def get_time2_reflection_narrative(person_data: Dict, partner_name: str = "them") -> str:
+def get_time2_reflection_context(person_data: Dict, partner_name: str = "them") -> str:
     """
-    Get pre-encoded Time 2 reflection narrative from persona data.
-    Enhancement 5: Stage 2 evaluation with Gemini-encoded reflection context.
+    Get comprehensive Time 2 reflection context combining narrative AND ALL numeric ratings.
+    Enhancement 5: Stage 2 evaluation with both qualitative and quantitative reflection data.
     
     Args:
-        person_data: Person dictionary with 'time2_reflection_narrative' field
+        person_data: Person dictionary with 'time2_reflection_narrative' and 'time2_reflection' fields
         partner_name: Name to use for the partner (unused, kept for compatibility)
     
     Returns:
-        Gemini-encoded natural language paragraph describing post-date reflections
+        Combined reflection context with narrative + ALL numeric ratings for precision
     """
-    # Use pre-encoded narrative if available
+    # Get pre-encoded narrative
     narrative = person_data.get('time2_reflection_narrative', '')
-    if narrative:
-        return narrative
     
-    # Fallback: return empty string if no pre-encoded narrative
-    # (This shouldn't happen if personas.json was properly encoded)
-    return ""
+    # Get structured numeric data
+    time2_data = person_data.get('time2_reflection', {})
+    
+    # Build comprehensive context
+    context_parts = []
+    
+    # Add narrative (natural language from Gemini)
+    if narrative:
+        context_parts.append(narrative)
+    
+    # Add ALL numeric ratings for precision (avoid information loss)
+    if time2_data:
+        context_parts.append("\n--- Precise Numeric Ratings (1-10 scale) ---")
+        
+        # 1. Satisfaction
+        satisfaction = time2_data.get('satisfaction', {})
+        satis_score = satisfaction.get('satis_2')
+        if satis_score is not None:
+            context_parts.append(f"Overall satisfaction: {satis_score}/10")
+        
+        # Add context about date experience
+        length_code = satisfaction.get('length')
+        if length_code == 1:
+            context_parts.append("Date length: Too short")
+        elif length_code == 2:
+            context_parts.append("Date length: Too long")
+        elif length_code == 3:
+            context_parts.append("Date length: Just right")
+        
+        numdat_code = satisfaction.get('numdat_2')
+        if numdat_code == 1:
+            context_parts.append("Number of dates that night: Too few")
+        elif numdat_code == 2:
+            context_parts.append("Number of dates that night: Too many")
+        elif numdat_code == 3:
+            context_parts.append("Number of dates that night: Just right")
+        
+        # 2. Updated preferences for self (what I want in a partner)
+        updated_prefs_self = time2_data.get('updated_preferences_self', {})
+        if updated_prefs_self:
+            context_parts.append("\nWhat I want in a partner (updated after date):")
+            for trait, value in updated_prefs_self.items():
+                if value is not None:
+                    context_parts.append(f"  - {trait.replace('_', ' ').title()}: {value}/100 points")
+        
+        # 3. Updated self-ratings (how I see myself)
+        updated_self = time2_data.get('updated_self_ratings', {})
+        if updated_self:
+            context_parts.append("\nHow I rate myself (updated after date):")
+            for trait, value in updated_self.items():
+                if value is not None:
+                    context_parts.append(f"  - {trait.replace('_', ' ').title()}: {value}/10")
+        
+        # 4. Updated perception of how others see me
+        updated_others = time2_data.get('updated_others_perception', {})
+        if updated_others:
+            context_parts.append("\nHow I think others perceive me (updated after date):")
+            for trait, value in updated_others.items():
+                if value is not None:
+                    context_parts.append(f"  - {trait.replace('_', ' ').title()}: {value}/10")
+    
+    return "\n".join(context_parts) if context_parts else ""
 
 
 def get_participant_score_prompt(person_data: Dict, partner_data: Dict, conversation: List[Dict]) -> str:
@@ -481,7 +683,7 @@ def get_participant_score_prompt_stage2(person_data: Dict, partner_data: Dict, c
     partner_name = "them"  # Generic pronoun
     
     # Get pre-encoded Time 2 reflection narrative
-    reflection_context = get_time2_reflection_narrative(person_data, partner_name)
+    reflection_context = get_time2_reflection_context(person_data, partner_name)
 
     prompt = (
         "You are Person A in a speed dating session. You've now had time to reflect on the date. "
@@ -506,7 +708,7 @@ def get_participant_score_prompt_stage2(person_data: Dict, partner_data: Dict, c
 
 
 def get_observer_score_prompt(person1_data: Dict, person2_data: Dict, conversation: List[Dict]) -> str:
-    """Generate observer scoring prompt (0-10) in English with full conversation context."""
+    """Generate multi-dimensional observer scoring prompt based on relationship science theories."""
     lines = []
     for idx, msg in enumerate(conversation, start=1):
         text = msg.get('content') or msg.get('message') or ''
@@ -518,30 +720,73 @@ def get_observer_score_prompt(person1_data: Dict, person2_data: Dict, conversati
     p2 = person2_data.get('persona_narrative', '').strip()
 
     prompt = (
-        "You are an experienced relationship observer reviewing a speed dating conversation. "
-        "Evaluate the overall match quality between the two participants by answering two questions.\n\n"
-        f"Person 1 background: {p1}\n"
+        "You are an expert relationship psychologist evaluating romantic compatibility based on established theories:\n"
+        "- Similarity-Attraction Theory: shared interests and values\n"
+        "- Social Exchange Theory: balanced reciprocity\n"
+        "- Attachment Theory: communication quality and emotional connection\n"
+        "- Personality Compatibility: complementary and similar traits\n"
+        "- Chemistry: mutual attraction and engagement\n"
+        "- Future Potential: aligned life goals and lifestyle\n\n"
+        
+        f"Person 1 background: {p1}\n\n"
         f"Person 2 background: {p2}\n\n"
-        "Conversation transcript:\n"
-        f"{conversation_text}\n\n"
-        "Please reply in English. Answer these two questions:\n\n"
-        "Question 1: How compatible do you think they are?\n"
-        "Scale: 1 = not compatible at all, 10 = extremely compatible\n"
-        "Your rating: X.X/10\n\n"
-        "Question 2: Do you think they should see each other again?\n"
-        "Answer: Yes or No\n\n"
-        "Format your response as:\n"
-        "Compatibility Score: X.X/10\n"
-        "Should Meet Again: Yes/No\n"
-        "Reasoning: [2-3 concise sentences explaining your assessment, considering: values/interests alignment, conversational flow, mutual attraction/chemistry, and long-term potential]"
+        f"Conversation transcript:\n{conversation_text}\n\n"
+        
+        "Evaluate the couple on SIX dimensions (0-10 each):\n\n"
+        
+        "1. INTEREST & VALUE ALIGNMENT (0-10)\n"
+        "   - Shared hobbies, activities, interests\n"
+        "   - Similar attitudes toward key life domains\n"
+        "   - Common ground for shared experiences\n\n"
+        
+        "2. PERSONALITY COMPATIBILITY (0-10)\n"
+        "   - Complementary traits (e.g., outgoing vs. reserved)\n"
+        "   - Similarity on core values (honesty, ambition, fun)\n"
+        "   - Emotional maturity match\n\n"
+        
+        "3. COMMUNICATION QUALITY (0-10)\n"
+        "   - Natural conversational flow\n"
+        "   - Active listening and engagement\n"
+        "   - Depth of discussion topics\n"
+        "   - Humor compatibility\n\n"
+        
+        "4. MUTUAL ATTRACTION & CHEMISTRY (0-10)\n"
+        "   - Both parties show genuine interest\n"
+        "   - Positive signals and enthusiasm\n"
+        "   - Balanced (not one-sided)\n"
+        "   - Flirting and connection cues\n\n"
+        
+        "5. RECIPROCITY & BALANCE (0-10)\n"
+        "   - Equal investment in conversation\n"
+        "   - Both ask questions and share\n"
+        "   - Neither dominates nor withdraws\n"
+        "   - Fair give-and-take dynamic\n\n"
+        
+        "6. LONG-TERM POTENTIAL (0-10)\n"
+        "   - Compatible life goals (career, family)\n"
+        "   - Similar lifestyle preferences\n"
+        "   - Age-appropriate match\n"
+        "   - Realistic future together\n\n"
+        
+        "STRICT OUTPUT REQUIREMENT:\n"
+        "Return ONLY a JSON object with exactly these keys (numbers 0-10, one decimal):\n"
+        "{\n"
+        "  \"interest_value_alignment\": X.X,\n"
+        "  \"personality_compatibility\": X.X,\n"
+        "  \"communication_quality\": X.X,\n"
+        "  \"mutual_attraction_chemistry\": X.X,\n"
+        "  \"reciprocity_balance\": X.X,\n"
+        "  \"long_term_potential\": X.X\n"
+        "}\n\n"
+        "Do not include any other text, explanation, rubric, or final score."
     )
     return prompt
 
 
 def get_observer_score_prompt_stage2(person1_data: Dict, person2_data: Dict, conversation: List[Dict]) -> str:
     """
-    Generate observer scoring prompt for Stage 2 (with reflection).
-    Enhancement 5: Uses averaged Time 2 data from both participants.
+    Generate multi-dimensional observer scoring prompt for Stage 2 (with reflection).
+    Uses relationship science theories and incorporates post-date reflections.
     """
     lines = []
     for idx, msg in enumerate(conversation, start=1):
@@ -557,37 +802,83 @@ def get_observer_score_prompt_stage2(person1_data: Dict, person2_data: Dict, con
     reflection_parts = []
     
     # Person 1's reflection (pre-encoded)
-    refl1 = get_time2_reflection_narrative(person1_data, "Person 2")
+    refl1 = get_time2_reflection_context(person1_data, "Person 2")
     if refl1:
         reflection_parts.append(f"Person 1's reflection: {refl1}")
     
     # Person 2's reflection (pre-encoded)
-    refl2 = get_time2_reflection_narrative(person2_data, "Person 1")
+    refl2 = get_time2_reflection_context(person2_data, "Person 1")
     if refl2:
         reflection_parts.append(f"Person 2's reflection: {refl2}")
     
     reflection_context = "\n".join(reflection_parts) if reflection_parts else "Both participants have reflected on the experience."
 
     prompt = (
-        "You are an experienced relationship observer reviewing a speed dating conversation. "
-        "Both participants have now had time to reflect on their date. "
-        "Evaluate the overall match quality considering both the conversation AND their reflections.\n\n"
-        f"Person 1 background: {p1}\n"
+        "You are an expert relationship psychologist evaluating romantic compatibility based on established theories:\n"
+        "- Similarity-Attraction Theory: shared interests and values\n"
+        "- Social Exchange Theory: balanced reciprocity\n"
+        "- Attachment Theory: communication quality and emotional connection\n"
+        "- Personality Compatibility: complementary and similar traits\n"
+        "- Chemistry: mutual attraction and engagement\n"
+        "- Future Potential: aligned life goals and lifestyle\n\n"
+        
+        f"Person 1 background: {p1}\n\n"
         f"Person 2 background: {p2}\n\n"
-        "Conversation transcript:\n"
-        f"{conversation_text}\n\n"
-        "Post-date reflections:\n"
-        f"{reflection_context}\n\n"
-        "Please reply in English. Answer these two questions:\n\n"
-        "Question 1: How compatible do you think they are?\n"
-        "Scale: 1 = not compatible at all, 10 = extremely compatible\n"
-        "Your rating: X.X/10\n\n"
-        "Question 2: Do you think they should see each other again?\n"
-        "Answer: Yes or No\n\n"
-        "Format your response as:\n"
-        "Compatibility Score: X.X/10\n"
-        "Should Meet Again: Yes/No\n"
-        "Reasoning: [2-3 concise sentences explaining your assessment after considering their reflections]"
+        f"Conversation transcript:\n{conversation_text}\n\n"
+        f"Post-date reflections:\n{reflection_context}\n\n"
+        "Focus on CHANGES in attitudes from during-date signals to post-date reflections. When scoring, weigh increases/decreases in:\n"
+        "- Desire to meet again, excitement, and enthusiasm\n"
+        "- Reported satisfaction with the date and experience\n"
+        "- Perceived compatibility and alignment after reflection\n"
+        "- Any red flags noted post-date vs none during the date (and vice versa)\n"
+        "- Updated self-ratings, others' perception, and preferences that impact compatibility\n\n"
+        "Now evaluate them on SIX dimensions (0-10 each), reflecting the post-date view while incorporating these changes:\n\n"
+        
+        "1. INTEREST & VALUE ALIGNMENT (0-10)\n"
+        "   - Shared hobbies, activities, interests\n"
+        "   - Similar attitudes toward key life domains\n"
+        "   - Common ground for shared experiences\n\n"
+        
+        "2. PERSONALITY COMPATIBILITY (0-10)\n"
+        "   - Complementary traits (e.g., outgoing vs. reserved)\n"
+        "   - Similarity on core values (honesty, ambition, fun)\n"
+        "   - Emotional maturity match\n\n"
+        
+        "3. COMMUNICATION QUALITY (0-10)\n"
+        "   - Natural conversational flow\n"
+        "   - Active listening and engagement\n"
+        "   - Depth of discussion topics\n"
+        "   - Humor compatibility\n\n"
+        
+        "4. MUTUAL ATTRACTION & CHEMISTRY (0-10)\n"
+        "   - Both parties show genuine interest (check reflections!)\n"
+        "   - Post-date satisfaction and excitement\n"
+        "   - Balanced (not one-sided)\n"
+        "   - Desire to meet again\n\n"
+        
+        "5. RECIPROCITY & BALANCE (0-10)\n"
+        "   - Equal investment in conversation\n"
+        "   - Both ask questions and share\n"
+        "   - Neither dominates nor withdraws\n"
+        "   - Fair give-and-take dynamic\n\n"
+        
+        "6. LONG-TERM POTENTIAL (0-10)\n"
+        "   - Compatible life goals (career, family)\n"
+        "   - Similar lifestyle preferences\n"
+        "   - Age-appropriate match\n"
+        "   - Realistic future together\n\n"
+        
+        "STRICT OUTPUT REQUIREMENT (JSON ONLY):\n"
+        "Return ONLY a JSON object with exactly these keys (numbers 0-10, one decimal):\n"
+        "{\n"
+        "  \"interest_value_alignment\": X.X,\n"
+        "  \"personality_compatibility\": X.X,\n"
+        "  \"communication_quality\": X.X,\n"
+        "  \"mutual_attraction_chemistry\": X.X,\n"
+        "  \"reciprocity_balance\": X.X,\n"
+        "  \"long_term_potential\": X.X\n"
+        "}\n\n"
+        "Do not include any other text, explanation, rubric, or final score."
     )
     return prompt
 
@@ -601,7 +892,7 @@ def build_participant_messages_stage2(person_data: Dict, partner_data: Dict, con
     partner_gender = "him" if partner_data.get('gender') == 1 else "her"
     
     # Get pre-encoded Time 2 reflection narrative
-    reflection_context = get_time2_reflection_narrative(person_data, "them")
+    reflection_context = get_time2_reflection_context(person_data, "them")
     
     msgs = [
         {"role": "system", "content": (
@@ -649,21 +940,76 @@ def build_observer_messages_stage2(person1_data: Dict, person2_data: Dict, conve
     
     # Get pre-encoded reflections from both participants
     reflection_parts = []
-    refl1 = get_time2_reflection_narrative(person1_data, "Person 2")
+    refl1 = get_time2_reflection_context(person1_data, "Person 2")
     if refl1:
         reflection_parts.append(f"Person 1's reflection: {refl1}")
-    refl2 = get_time2_reflection_narrative(person2_data, "Person 1")
+    refl2 = get_time2_reflection_context(person2_data, "Person 1")
     if refl2:
         reflection_parts.append(f"Person 2's reflection: {refl2}")
     reflection_context = "\n".join(reflection_parts) if reflection_parts else "Both participants have reflected on the experience."
     
-    # Build system prompt
+    # Build system prompt with multi-dimensional evaluation based on relationship science
     system_content = (
-        "You are an experienced relationship observer. Both participants have now had time to reflect on their date. Reply in English. "
-        "Output format and order:\n"
-        "1) Provide 2-3 concise sentences explaining your assessment considering the conversation AND their reflections.\n"
-        "2) Then include one line specifying the rubric: 'Rubric: 0 = absolutely unwilling to meet again; 5 = indifferent; 10 = perfect match'.\n"
-        "3) On a new separate line at the very end, write exactly: 'Score: X.X/10'."
+        "You are an expert relationship psychologist evaluating romantic compatibility based on established theories:\n"
+        "- Similarity-Attraction Theory: shared interests and values\n"
+        "- Social Exchange Theory: balanced reciprocity\n"
+        "- Attachment Theory: communication quality and emotional connection\n"
+        "- Personality Compatibility: complementary and similar traits\n"
+        "- Chemistry: mutual attraction and engagement\n"
+    "- Future Potential: aligned life goals and lifestyle\n\n"
+    "Focus on CHANGES in attitudes from during-date signals to post-date reflections. When scoring, weigh increases/decreases in:\n"
+    "- Desire to meet again, excitement, and enthusiasm\n"
+    "- Reported satisfaction with the date and experience\n"
+    "- Perceived compatibility and alignment after reflection\n"
+    "- Any red flags noted post-date vs none during the date (and vice versa)\n"
+    "- Updated self-ratings, others' perception, and preferences that impact compatibility\n\n"
+    "Now evaluate them on SIX dimensions (0-10 each), reflecting the post-date view while incorporating these changes:\n\n"
+        
+        "1. INTEREST & VALUE ALIGNMENT (0-10)\n"
+        "   - Shared hobbies, activities, interests\n"
+        "   - Similar attitudes toward key life domains\n"
+        "   - Common ground for shared experiences\n\n"
+        
+        "2. PERSONALITY COMPATIBILITY (0-10)\n"
+        "   - Complementary traits (e.g., outgoing vs. reserved)\n"
+        "   - Similarity on core values (honesty, ambition, fun)\n"
+        "   - Emotional maturity match\n\n"
+        
+        "3. COMMUNICATION QUALITY (0-10)\n"
+        "   - Natural conversational flow\n"
+        "   - Active listening and engagement\n"
+        "   - Depth of discussion topics\n"
+        "   - Humor compatibility\n\n"
+        
+        "4. MUTUAL ATTRACTION & CHEMISTRY (0-10)\n"
+        "   - Both parties show genuine interest (check reflections!)\n"
+        "   - Post-date satisfaction and excitement\n"
+        "   - Balanced (not one-sided)\n"
+        "   - Desire to meet again\n\n"
+        
+        "5. RECIPROCITY & BALANCE (0-10)\n"
+        "   - Equal investment in conversation\n"
+        "   - Both ask questions and share\n"
+        "   - Neither dominates nor withdraws\n"
+        "   - Fair give-and-take dynamic\n\n"
+        
+        "6. LONG-TERM POTENTIAL (0-10)\n"
+        "   - Compatible life goals (career, family)\n"
+        "   - Similar lifestyle preferences\n"
+        "   - Age-appropriate match\n"
+        "   - Realistic future together\n\n"
+        
+    "STRICT OUTPUT REQUIREMENT (JSON ONLY):\n"
+        "Return ONLY a JSON object with exactly these keys (numbers 0-10, one decimal):\n"
+        "{\n"
+        "  \"interest_value_alignment\": X.X,\n"
+        "  \"personality_compatibility\": X.X,\n"
+        "  \"communication_quality\": X.X,\n"
+        "  \"mutual_attraction_chemistry\": X.X,\n"
+        "  \"reciprocity_balance\": X.X,\n"
+        "  \"long_term_potential\": X.X\n"
+        "}\n\n"
+        "Do not include any other text, explanation, rubric, or final score."
     )
     
     # Add ICL examples if provided (same format as Stage 1)
@@ -687,9 +1033,8 @@ def build_observer_messages_stage2(person1_data: Dict, person2_data: Dict, conve
             f"Person 1 background: {p1}\n\n"
             f"Person 2 background: {p2}\n\n"
             f"Conversation transcript:\n{conversation_text}\n\n"
-            f"Post-date reflections:\n{reflection_context}\n\n"
-            "Now, given their reflections, rate the overall match quality on a 0-10 scale. "
-            "Follow the required order: reasoning, then rubric, and finally 'Score: X.X/10'."
+            f"Post-date reflections (note and weigh CHANGES in attitudes):\n{reflection_context}\n\n"
+            "Now, given their reflections and the changes relative to the conversation, output ONLY the requested JSON object with the six metric scores (0-10)."
         )}
     ]
     return msgs
@@ -704,6 +1049,8 @@ def evaluate_with_scores(
     report_curves: bool = False,
     icl_examples_path: str = None,
     stage: int = 1,
+    participant_model: str = None,
+    observer_model: str = None,
 ):
     """
     使用0-10分评分系统重新评估LLM方法
@@ -724,6 +1071,10 @@ def evaluate_with_scores(
         print("Stage 2: Using Time 2 reflection data for enhanced evaluation")
     if icl_examples_path:
         print(f"Using in-context learning examples from: {icl_examples_path}")
+    if participant_model:
+        print(f"Participant model override: {participant_model}")
+    if observer_model:
+        print(f"Observer model override: {observer_model}")
     
     # 加载对话数据
     with open(conversations_path, 'r', encoding='utf-8') as f:
@@ -838,32 +1189,32 @@ def evaluate_with_scores(
                     if method in ("participant", "both"):
                         msg_p1 = build_participant_messages(person1_data, person2_data, all_messages, perspective="person1")
                         msg_p2 = build_participant_messages(person2_data, person1_data, all_messages, perspective="person2")
-                        future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.3, "participant")
-                        future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.3, "participant")
+                        future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.6, "participant", participant_model)
+                        future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.6, "participant", participant_model)
                     if method in ("observer", "both"):
                         # Regular observer
                         msg_obs = build_observer_messages(person1_data, person2_data, all_messages)
-                        future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.3, "observer")
+                        future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.6, "observer", observer_model)
                         # Advanced observer with ICL (if examples provided)
                         if icl_examples:
                             msg_obs_adv = build_observer_messages(person1_data, person2_data, all_messages, icl_examples=icl_examples)
-                            future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.3, "observer")
+                            future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.6, "observer", observer_model)
                 
                 # Stage 2: Evaluation with reflection (Enhancement 5)
                 elif stage == 2:
                     if method in ("participant", "both"):
                         msg_p1 = build_participant_messages_stage2(person1_data, person2_data, all_messages, perspective="person1")
                         msg_p2 = build_participant_messages_stage2(person2_data, person1_data, all_messages, perspective="person2")
-                        future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.3, "participant")
-                        future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.3, "participant")
+                        future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.6, "participant", participant_model)
+                        future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.6, "participant", participant_model)
                     if method in ("observer", "both"):
                         # Regular observer
                         msg_obs = build_observer_messages_stage2(person1_data, person2_data, all_messages)
-                        future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.3, "observer")
+                        future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.6, "observer", observer_model)
                         # Advanced observer with ICL (if examples provided)
                         if icl_examples:
                             msg_obs_adv = build_observer_messages_stage2(person1_data, person2_data, all_messages, icl_examples=icl_examples)
-                            future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.3, "observer")
+                            future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.6, "observer", observer_model)
 
                 scores = {k: fut.result() for k, fut in future_map.items()}
 
@@ -872,9 +1223,11 @@ def evaluate_with_scores(
             advanced_observer_entry = None
 
             if 'p1' in scores and 'p2' in scores:
-                s1 = scores['p1']
+                s1_pack = scores['p1']
+                s1 = s1_pack.get('score') if isinstance(s1_pack, dict) else float(s1_pack)
                 print(f"  Person 1 score: {s1:.1f}/10")
-                s2 = scores['p2']
+                s2_pack = scores['p2']
+                s2 = s2_pack.get('score') if isinstance(s2_pack, dict) else float(s2_pack)
                 print(f"  Person 2 score: {s2:.1f}/10")
                 combined = (s1 * s2) / 100.0
                 print(f"  Combined score: {combined:.3f}")
@@ -883,24 +1236,42 @@ def evaluate_with_scores(
                     'person1_score': s1,
                     'person2_score': s2,
                     'combined_score': combined,
-                    'person1_response': f"Score: {s1}",  # Store score instead of full response
-                    'person2_response': f"Score: {s2}"
+                    'person1_response': f"Score: {s1}",
+                    'person2_response': f"Score: {s2}",
+                    'person1_raw_response': (s1_pack.get('raw') if isinstance(s1_pack, dict) else None),
+                    'person2_raw_response': (s2_pack.get('raw') if isinstance(s2_pack, dict) else None)
                 }
 
             if 'obs' in scores:
-                so = scores['obs']
-                print(f"  Observer score: {so:.1f}/10")
+                so_pack = scores['obs']
+                so = so_pack.get('score') if isinstance(so_pack, dict) else float(so_pack)
+                metrics = so_pack.get('metrics') if isinstance(so_pack, dict) else None
+                if metrics:
+                    # Print metrics and computed averages
+                    print("  Observer metrics (0-10):")
+                    print("    interest_value_alignment:      {:.1f}".format(metrics['interest_value_alignment']))
+                    print("    personality_compatibility:     {:.1f}".format(metrics['personality_compatibility']))
+                    print("    communication_quality:         {:.1f}".format(metrics['communication_quality']))
+                    print("    mutual_attraction_chemistry:   {:.1f}".format(metrics['mutual_attraction_chemistry']))
+                    print("    reciprocity_balance:           {:.1f}".format(metrics['reciprocity_balance']))
+                    print("    long_term_potential:           {:.1f}".format(metrics['long_term_potential']))
+                    unweighted_avg = sum(metrics.values()) / 6.0
+                    print(f"  Unweighted average: {unweighted_avg:.2f}/10")
+                print(f"  Observer weighted score: {so:.1f}/10")
                 norm_o = so / 10.0
                 print(f"  Observer normalized: {norm_o:.3f}")
                 observer_entry = {
                     'pair_id': pair_id,
                     'score': so,
                     'normalized_score': norm_o,
-                    'response': f"Score: {so}"
+                    'response': f"Score: {so}",
+                    'raw_response': (so_pack.get('raw') if isinstance(so_pack, dict) else None),
+                    'metrics': metrics
                 }
 
             if 'obs_adv' in scores:
-                so_adv = scores['obs_adv']
+                so_adv_pack = scores['obs_adv']
+                so_adv = so_adv_pack.get('score') if isinstance(so_adv_pack, dict) else float(so_adv_pack)
                 print(f"  Advanced Observer score: {so_adv:.1f}/10")
                 norm_o_adv = so_adv / 10.0
                 print(f"  Advanced Observer normalized: {norm_o_adv:.3f}")
@@ -908,7 +1279,8 @@ def evaluate_with_scores(
                     'pair_id': pair_id,
                     'score': so_adv,
                     'normalized_score': norm_o_adv,
-                    'response': f"Score: {so_adv}"
+                    'response': f"Score: {so_adv}",
+                    'raw_response': (so_adv_pack.get('raw') if isinstance(so_adv_pack, dict) else None)
                 }
 
             print(f"  Ground truth: {'Match' if ground_truth_match else 'No match'}")
@@ -1263,6 +1635,18 @@ if __name__ == "__main__":
         default=1,
         help="Evaluation stage: 1=immediate (after conversation), 2=with reflection (Time 2 data). Enhancement 5."
     )
+    parser.add_argument(
+        "--participant-model",
+        type=str,
+        default=None,
+        help="Override model id for participant scoring (OpenRouter model slug)"
+    )
+    parser.add_argument(
+        "--observer-model",
+        type=str,
+        default=None,
+        help="Override model id for observer scoring (OpenRouter model slug). Example: google/gemini-2.5-flash"
+    )
 
     args = parser.parse_args()
 
@@ -1275,4 +1659,6 @@ if __name__ == "__main__":
         report_curves=args.report_curves,
         icl_examples_path=args.icl_examples,
         stage=args.stage,
+        participant_model=args.participant_model,
+        observer_model=args.observer_model,
     )
