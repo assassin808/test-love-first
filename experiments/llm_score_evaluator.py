@@ -407,6 +407,82 @@ def build_observer_messages(person1_data: Dict, person2_data: Dict, conversation
     return msgs
 
 
+def encode_time2_reflection_to_narrative(time2_data: Dict, partner_name: str = "them") -> str:
+    """
+    Convert Time 2 reflection data to natural language narrative.
+    Enhancement 5: Stage 2 evaluation with reflection context.
+    
+    Args:
+        time2_data: Dictionary containing satis_2, attr2_1, sinc2_1, etc.
+        partner_name: Name to use for the partner
+    
+    Returns:
+        Natural language paragraph describing post-date reflections
+    """
+    if not time2_data:
+        return ""
+    
+    # Helper function to convert scores to qualitative
+    def score_to_qual(score):
+        if score is None:
+            return None
+        score = float(score)
+        if score <= 2:
+            return "very low"
+        elif score <= 4:
+            return "somewhat low"
+        elif score <= 6:
+            return "moderate"
+        elif score <= 8:
+            return "quite high"
+        else:
+            return "very high"
+    
+    narrative_parts = []
+    
+    # Satisfaction
+    satisfaction = time2_data.get('satisfaction', {})
+    satis_2 = satisfaction.get('satis_2')
+    if satis_2 is not None:
+        satis_qual = score_to_qual(satis_2)
+        narrative_parts.append(f"Your overall satisfaction with how the date went is {satis_qual}.")
+    
+    # Updated perception of partner (attr2_*, sinc2_*, etc.)
+    updated_prefs = time2_data.get('updated_preferences_opposite', {})
+    if updated_prefs:
+        traits = []
+        for trait_name, field_name in [
+            ('attractive', 'attractiveness'),
+            ('sincere', 'sincerity'),
+            ('intelligent', 'intelligence'),
+            ('fun', 'fun'),
+            ('ambitious', 'ambition')
+        ]:
+            score = updated_prefs.get(field_name)
+            if score is not None:
+                qual = score_to_qual(score)
+                traits.append(f"{qual} {trait_name}")
+        
+        if traits:
+            if len(traits) == 1:
+                narrative_parts.append(f"You now see {partner_name} as {traits[0]}.")
+            elif len(traits) == 2:
+                narrative_parts.append(f"You now see {partner_name} as {traits[0]} and {traits[1]}.")
+            else:
+                narrative_parts.append(f"You now see {partner_name} as {', '.join(traits[:-1])}, and {traits[-1]}.")
+    
+    # Shared interests perception
+    shared_int = updated_prefs.get('shared_interests')
+    if shared_int is not None:
+        shared_qual = score_to_qual(shared_int)
+        if float(shared_int) >= 7:
+            narrative_parts.append(f"You noticed {shared_qual} shared interests between you two.")
+        elif float(shared_int) <= 3:
+            narrative_parts.append(f"You noticed {shared_qual} common ground between you.")
+    
+    return " ".join(narrative_parts) if narrative_parts else ""
+
+
 def get_participant_score_prompt(person_data: Dict, partner_data: Dict, conversation: List[Dict]) -> str:
     """Generate participant scoring prompt (0-10) in English with full conversation context."""
     # Build a simple transcript block
@@ -435,6 +511,53 @@ def get_participant_score_prompt(person_data: Dict, partner_data: Dict, conversa
         "Like Score: X.X/10\n"
         "See Again: Yes/No\n"
         "Reasoning: [1-2 short sentences explaining your ratings]"
+    )
+    return prompt
+
+
+def get_participant_score_prompt_stage2(person_data: Dict, partner_data: Dict, conversation: List[Dict], time2_data: Dict) -> str:
+    """
+    Generate participant scoring prompt for Stage 2 (with reflection).
+    Enhancement 5: Includes Time 2 reflection context.
+    """
+    # Build conversation transcript
+    lines = []
+    for idx, msg in enumerate(conversation, start=1):
+        text = msg.get('content') or msg.get('message') or ''
+        if text:
+            lines.append(f"Message {idx}: {text}")
+    conversation_text = "\n".join(lines)
+
+    persona_block = person_data.get('persona_narrative', '').strip()
+    
+    # Get partner name from persona
+    partner_gender = "him" if partner_data.get('gender') == 1 else "her"
+    partner_name = "them"  # Generic pronoun
+    
+    # Encode Time 2 reflection
+    reflection_context = encode_time2_reflection_to_narrative(
+        person_data.get('time2_reflection', {}), 
+        partner_name
+    )
+
+    prompt = (
+        "You are Person A in a speed dating session. You've now had time to reflect on the date. "
+        "Based on your conversation AND your reflection afterward, please answer two questions.\n\n"
+        f"Your background (for context): {persona_block}\n\n"
+        "Conversation transcript:\n"
+        f"{conversation_text}\n\n"
+        "After the date, you've had time to reflect:\n"
+        f"{reflection_context}\n\n"
+        "Given this reflection, please reply in English. Answer these two questions:\n\n"
+        "Question 1: How much do you like this person?\n"
+        "Scale: 1 = don't like at all, 10 = like a lot\n"
+        "Your rating: X.X/10\n\n"
+        f"Question 2: Would you like to see {partner_gender} again?\n"
+        "Answer: Yes or No\n\n"
+        "Format your response as:\n"
+        "Like Score: X.X/10\n"
+        "See Again: Yes/No\n"
+        "Reasoning: [1-2 short sentences explaining your ratings after reflection]"
     )
     return prompt
 
@@ -472,6 +595,172 @@ def get_observer_score_prompt(person1_data: Dict, person2_data: Dict, conversati
     return prompt
 
 
+def get_observer_score_prompt_stage2(person1_data: Dict, person2_data: Dict, conversation: List[Dict]) -> str:
+    """
+    Generate observer scoring prompt for Stage 2 (with reflection).
+    Enhancement 5: Uses averaged Time 2 data from both participants.
+    """
+    lines = []
+    for idx, msg in enumerate(conversation, start=1):
+        text = msg.get('content') or msg.get('message') or ''
+        if text:
+            lines.append(f"Message {idx}: {text}")
+    conversation_text = "\n".join(lines)
+
+    p1 = person1_data.get('persona_narrative', '').strip()
+    p2 = person2_data.get('persona_narrative', '').strip()
+    
+    # Combine reflection data from both participants
+    time2_p1 = person1_data.get('time2_reflection', {})
+    time2_p2 = person2_data.get('time2_reflection', {})
+    
+    reflection_parts = []
+    
+    # Person 1's reflection
+    refl1 = encode_time2_reflection_to_narrative(time2_p1, "Person 2")
+    if refl1:
+        reflection_parts.append(f"Person 1's reflection: {refl1}")
+    
+    # Person 2's reflection
+    refl2 = encode_time2_reflection_to_narrative(time2_p2, "Person 1")
+    if refl2:
+        reflection_parts.append(f"Person 2's reflection: {refl2}")
+    
+    reflection_context = "\n".join(reflection_parts) if reflection_parts else "Both participants have reflected on the experience."
+
+    prompt = (
+        "You are an experienced relationship observer reviewing a speed dating conversation. "
+        "Both participants have now had time to reflect on their date. "
+        "Evaluate the overall match quality considering both the conversation AND their reflections.\n\n"
+        f"Person 1 background: {p1}\n"
+        f"Person 2 background: {p2}\n\n"
+        "Conversation transcript:\n"
+        f"{conversation_text}\n\n"
+        "Post-date reflections:\n"
+        f"{reflection_context}\n\n"
+        "Please reply in English. Answer these two questions:\n\n"
+        "Question 1: How compatible do you think they are?\n"
+        "Scale: 1 = not compatible at all, 10 = extremely compatible\n"
+        "Your rating: X.X/10\n\n"
+        "Question 2: Do you think they should see each other again?\n"
+        "Answer: Yes or No\n\n"
+        "Format your response as:\n"
+        "Compatibility Score: X.X/10\n"
+        "Should Meet Again: Yes/No\n"
+        "Reasoning: [2-3 concise sentences explaining your assessment after considering their reflections]"
+    )
+    return prompt
+
+
+def build_participant_messages_stage2(person_data: Dict, partner_data: Dict, conversation: List[Dict], perspective: str) -> List[Dict]:
+    """
+    Build messages for Stage 2 participant scoring (with reflection).
+    Enhancement 5: Includes Time 2 reflection context.
+    """
+    persona_block = (person_data.get('persona_narrative') or '').strip()
+    partner_gender = "him" if partner_data.get('gender') == 1 else "her"
+    
+    # Encode Time 2 reflection
+    reflection_context = encode_time2_reflection_to_narrative(
+        person_data.get('time2_reflection', {}), 
+        "them"
+    )
+    
+    msgs = [
+        {"role": "system", "content": (
+            "You are the participant (Person A) in a speed dating session. You've now had time to reflect on the date. Reply in English. "
+            "Output format and order:\n"
+            "1) Start with a private inner monologue wrapped in <INNER_THOUGHT>...</INNER_THOUGHT> reflecting your feelings after reflection.\n"
+            "2) Then provide 1-2 short sentences of outward reasoning as Person A.\n"
+            "3) Then include one line specifying the rubric: 'Rubric: 0 = absolutely unwilling to meet again; 5 = indifferent; 10 = perfect match'.\n"
+            "4) On a new separate last line, write exactly: 'Score: <number>/10'.\n"
+            f"Your background: {persona_block}\n\n"
+            f"After the date, you've had time to reflect:\n{reflection_context}"
+        )}
+    ]
+    msgs.extend(build_role_messages_from_conversation(conversation, perspective=perspective))
+    msgs.append({
+        "role": "user",
+        "content": (
+            f"Now, given your reflection, rate your willingness to meet {partner_gender} again on a 0-10 scale. "
+            "Follow the required order: <INNER_THOUGHT>...</INNER_THOUGHT>, then reasoning, then rubric, and finally 'Score: <number>/10'."
+        )
+    })
+    return msgs
+
+
+def build_observer_messages_stage2(person1_data: Dict, person2_data: Dict, conversation: List[Dict], icl_examples: List[Dict] = None) -> List[Dict]:
+    """
+    Build messages for Stage 2 observer scoring (with reflection).
+    Enhancement 5: Includes Time 2 reflection context from both participants.
+    """
+    p1 = (person1_data.get('persona_narrative') or '').strip()
+    p2 = (person2_data.get('persona_narrative') or '').strip()
+    
+    # Build conversation transcript
+    conversation_lines = []
+    for idx, msg in enumerate(conversation, start=1):
+        if isinstance(msg, dict):
+            text = msg.get('content') or msg.get('message') or ''
+            speaker = msg.get('speaker', f'Message {idx}')
+        else:
+            text = str(msg)
+            speaker = f'Message {idx}'
+        if text:
+            conversation_lines.append(f"{speaker}: {text}")
+    conversation_text = "\n".join(conversation_lines)
+    
+    # Encode reflections from both participants
+    time2_p1 = person1_data.get('time2_reflection', {})
+    time2_p2 = person2_data.get('time2_reflection', {})
+    
+    reflection_parts = []
+    refl1 = encode_time2_reflection_to_narrative(time2_p1, "Person 2")
+    if refl1:
+        reflection_parts.append(f"Person 1's reflection: {refl1}")
+    refl2 = encode_time2_reflection_to_narrative(time2_p2, "Person 1")
+    if refl2:
+        reflection_parts.append(f"Person 2's reflection: {refl2}")
+    reflection_context = "\n".join(reflection_parts) if reflection_parts else "Both participants have reflected on the experience."
+    
+    # Build system prompt
+    system_content = (
+        "You are an experienced relationship observer. Both participants have now had time to reflect on their date. Reply in English. "
+        "Output format and order:\n"
+        "1) Provide 2-3 concise sentences explaining your assessment considering the conversation AND their reflections.\n"
+        "2) Then include one line specifying the rubric: 'Rubric: 0 = absolutely unwilling to meet again; 5 = indifferent; 10 = perfect match'.\n"
+        "3) On a new separate line at the very end, write exactly: 'Score: X.X/10'."
+    )
+    
+    # Add ICL examples if provided (same format as Stage 1)
+    if icl_examples:
+        system_content += "\n\nHere are some example evaluations to calibrate your scoring:"
+        for idx, ex in enumerate(icl_examples, start=1):
+            ex_p1_bg = ex.get('person1_background', '').strip()
+            ex_p2_bg = ex.get('person2_background', '').strip()
+            gt_score = 10.0 if ex['match'] else 0.0
+            
+            system_content += (
+                f"\n\nExample {idx}:\n"
+                f"Person 1: {ex_p1_bg}\n"
+                f"Person 2: {ex_p2_bg}\n"
+                f"Ground truth score: {gt_score}/10 ({'Match' if ex['match'] else 'No Match'})"
+            )
+    
+    msgs = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": (
+            f"Person 1 background: {p1}\n\n"
+            f"Person 2 background: {p2}\n\n"
+            f"Conversation transcript:\n{conversation_text}\n\n"
+            f"Post-date reflections:\n{reflection_context}\n\n"
+            "Now, given their reflections, rate the overall match quality on a 0-10 scale. "
+            "Follow the required order: reasoning, then rubric, and finally 'Score: X.X/10'."
+        )}
+    ]
+    return msgs
+
+
 def evaluate_with_scores(
     conversations_path: str,
     output_dir: str = "results",
@@ -480,6 +769,7 @@ def evaluate_with_scores(
     threshold: float = 0.5,
     report_curves: bool = False,
     icl_examples_path: str = None,
+    stage: int = 1,
 ):
     """
     使用0-10分评分系统重新评估LLM方法
@@ -488,13 +778,16 @@ def evaluate_with_scores(
         conversations_path: conversations.json路径
         output_dir: 输出目录
         icl_examples_path: Optional path to in-context learning examples JSON for advanced observer
+        stage: Evaluation stage (1=immediate, 2=with reflection) - Enhancement 5
     """
     
     print("=" * 70)
-    print("LLM SCORE-BASED EVALUATION")
+    print(f"LLM SCORE-BASED EVALUATION - STAGE {stage}")
     print("=" * 70)
     print(f"Loading conversations from: {conversations_path}\n")
-    print(f"Method: {method} | Decision threshold: {threshold} | Report curves: {report_curves}")
+    print(f"Method: {method} | Stage: {stage} | Decision threshold: {threshold} | Report curves: {report_curves}")
+    if stage == 2:
+        print("Stage 2: Using Time 2 reflection data for enhanced evaluation")
     if icl_examples_path:
         print(f"Using in-context learning examples from: {icl_examples_path}")
     
@@ -598,19 +891,38 @@ def evaluate_with_scores(
             # 根据 method 并行发起所需的调用（使用自动重试的评分提取）
             with _cf.ThreadPoolExecutor(max_workers=4) as ex_pair:
                 future_map = {}
-                if method in ("participant", "both"):
-                    msg_p1 = build_participant_messages(person1_data, person2_data, all_messages, perspective="person1")
-                    msg_p2 = build_participant_messages(person2_data, person1_data, all_messages, perspective="person2")
-                    future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.3, "participant")
-                    future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.3, "participant")
-                if method in ("observer", "both"):
-                    # Regular observer
-                    msg_obs = build_observer_messages(person1_data, person2_data, all_messages)
-                    future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.3, "observer")
-                    # Advanced observer with ICL (if examples provided)
-                    if icl_examples:
-                        msg_obs_adv = build_observer_messages(person1_data, person2_data, all_messages, icl_examples=icl_examples)
-                        future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.3, "observer")
+                
+                # Stage 1: Immediate evaluation (existing logic)
+                if stage == 1:
+                    if method in ("participant", "both"):
+                        msg_p1 = build_participant_messages(person1_data, person2_data, all_messages, perspective="person1")
+                        msg_p2 = build_participant_messages(person2_data, person1_data, all_messages, perspective="person2")
+                        future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.3, "participant")
+                        future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.3, "participant")
+                    if method in ("observer", "both"):
+                        # Regular observer
+                        msg_obs = build_observer_messages(person1_data, person2_data, all_messages)
+                        future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.3, "observer")
+                        # Advanced observer with ICL (if examples provided)
+                        if icl_examples:
+                            msg_obs_adv = build_observer_messages(person1_data, person2_data, all_messages, icl_examples=icl_examples)
+                            future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.3, "observer")
+                
+                # Stage 2: Evaluation with reflection (Enhancement 5)
+                elif stage == 2:
+                    if method in ("participant", "both"):
+                        msg_p1 = build_participant_messages_stage2(person1_data, person2_data, all_messages, perspective="person1")
+                        msg_p2 = build_participant_messages_stage2(person2_data, person1_data, all_messages, perspective="person2")
+                        future_map['p1'] = ex_pair.submit(call_api_with_score_extraction, msg_p1, 0.3, "participant")
+                        future_map['p2'] = ex_pair.submit(call_api_with_score_extraction, msg_p2, 0.3, "participant")
+                    if method in ("observer", "both"):
+                        # Regular observer
+                        msg_obs = build_observer_messages_stage2(person1_data, person2_data, all_messages)
+                        future_map['obs'] = ex_pair.submit(call_api_with_score_extraction, msg_obs, 0.3, "observer")
+                        # Advanced observer with ICL (if examples provided)
+                        if icl_examples:
+                            msg_obs_adv = build_observer_messages_stage2(person1_data, person2_data, all_messages, icl_examples=icl_examples)
+                            future_map['obs_adv'] = ex_pair.submit(call_api_with_score_extraction, msg_obs_adv, 0.3, "observer")
 
                 scores = {k: fut.result() for k, fut in future_map.items()}
 
@@ -788,7 +1100,7 @@ def evaluate_with_scores(
         print("\n3. ADVANCED OBSERVER METHOD: No scores available.")
     
     # 保存详细结果
-    output_path = f"{output_dir}/llm_score_evaluation.json"
+    output_path = f"{output_dir}/llm_score_evaluation_stage{stage}.json"
     output_data = {
         'participant_method': {
             'scores': results['participant_scores'],
@@ -927,6 +1239,13 @@ if __name__ == "__main__":
         default=None,
         help="Path to in-context learning examples JSON for advanced observer (5 pairs outside test set)"
     )
+    parser.add_argument(
+        "--stage",
+        type=int,
+        choices=[1, 2],
+        default=1,
+        help="Evaluation stage: 1=immediate (after conversation), 2=with reflection (Time 2 data). Enhancement 5."
+    )
 
     args = parser.parse_args()
 
@@ -938,4 +1257,5 @@ if __name__ == "__main__":
         threshold=args.threshold,
         report_curves=args.report_curves,
         icl_examples_path=args.icl_examples,
+        stage=args.stage,
     )

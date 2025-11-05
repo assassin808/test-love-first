@@ -78,6 +78,51 @@ class PersonaGenerator:
         self.pairs_path = pairs_path
         self.pairs = []
         self.personas = []
+    
+    @staticmethod
+    def _score_to_qualitative(score: float) -> str:
+        """
+        Convert numeric score (1-10) to qualitative description.
+        Enhancement 2: Remove ALL numbers from narratives.
+        
+        Args:
+            score: Numeric rating (1-10)
+        
+        Returns:
+            Qualitative description string
+        """
+        if score <= 2:
+            return "not at all important"
+        elif score <= 4:
+            return "somewhat important"
+        elif score <= 6:
+            return "moderately important"
+        elif score <= 8:
+            return "quite important"
+        else:
+            return "extremely important"
+    
+    @staticmethod
+    def _rating_to_qualitative(rating: float) -> str:
+        """
+        Convert self-rating/preference (1-10) to qualitative description.
+        
+        Args:
+            rating: Numeric rating (1-10)
+        
+        Returns:
+            Qualitative description
+        """
+        if rating <= 2:
+            return "very low"
+        elif rating <= 4:
+            return "somewhat low"
+        elif rating <= 6:
+            return "moderate"
+        elif rating <= 8:
+            return "quite high"
+        else:
+            return "very high"
         
     def load_pairs(self):
         """加载配对数据"""
@@ -88,12 +133,16 @@ class PersonaGenerator:
         return self.pairs
     
     def _encode_all_interests(self, data: Dict) -> str:
-        """完整编码所有兴趣爱好（不过滤，保留所有评分）"""
+        """
+        完整编码所有兴趣爱好
+        ENHANCEMENT 2: Remove numeric ratings, use qualitative descriptions
+        """
         interests_text = []
         for key, name in INTEREST_NAMES.items():
             if key in data and data[key] is not None:
-                score = int(data[key])
-                interests_text.append(f"{name} (rated {score}/10)")
+                score = float(data[key])
+                qual = self._rating_to_qualitative(score)
+                interests_text.append(f"{name} ({qual} interest)")
         
         if interests_text:
             return "My interests and how much I enjoy them: " + ", ".join(interests_text) + "."
@@ -129,16 +178,30 @@ class PersonaGenerator:
         return valid_attrs
     
     def _encode_preferences_complete(self, preferences: List[tuple]) -> str:
-        """完整编码择偶偏好（保留所有分数，不过滤）"""
+        """
+        完整编码择偶偏好
+        ENHANCEMENT 2: Remove point values, describe relative importance
+        """
         if not preferences:
             return "balanced across all qualities"
         
-        # 保留所有偏好和分数
-        pref_text = ", ".join([f"{name} ({int(score)} points)" for name, score in preferences])
-        return pref_text
+        # Describe preferences qualitatively by their rank/importance
+        pref_descriptions = []
+        for i, (name, score) in enumerate(preferences):
+            if i == 0:
+                pref_descriptions.append(f"{name} (most important)")
+            elif i == len(preferences) - 1:
+                pref_descriptions.append(f"{name} (least important)")
+            else:
+                pref_descriptions.append(name)
+        
+        return ", ".join(pref_descriptions)
     
     def _encode_self_ratings_complete(self, data: Dict) -> str:
-        """完整编码自我评价（保留所有分数）"""
+        """
+        完整编码自我评价
+        ENHANCEMENT 2: Remove numeric scores, use qualitative descriptions
+        """
         ratings = {
             'attractiveness': data.get('attr3_1'),
             'sincerity': data.get('sinc3_1'),
@@ -147,18 +210,21 @@ class PersonaGenerator:
             'ambition': data.get('amb3_1')
         }
         
-        # 保留所有评分
-        valid_ratings = [(k, int(v)) for k, v in ratings.items() if v is not None]
+        # Convert to qualitative
+        valid_ratings = [(k, float(v), self._rating_to_qualitative(float(v))) for k, v in ratings.items() if v is not None]
         if not valid_ratings:
             return "I haven't rated myself yet."
         
         valid_ratings.sort(key=lambda x: x[1], reverse=True)
         
-        ratings_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_ratings])
+        ratings_text = ", ".join([f"{name} ({qual})" for name, _, qual in valid_ratings])
         return f"How I rate myself: {ratings_text}."
     
     def _encode_others_perception_complete(self, data: Dict) -> str:
-        """完整编码他人评价预期（保留所有分数）"""
+        """
+        完整编码他人评价预期
+        ENHANCEMENT 2: Remove numeric scores, use qualitative descriptions
+        """
         perceptions = {
             'attractiveness': data.get('attr5_1'),
             'sincerity': data.get('sinc5_1'),
@@ -167,14 +233,14 @@ class PersonaGenerator:
             'ambition': data.get('amb5_1')
         }
         
-        # 保留所有评分
-        valid_perceptions = [(k, int(v)) for k, v in perceptions.items() if v is not None]
+        # Convert to qualitative
+        valid_perceptions = [(k, float(v), self._rating_to_qualitative(float(v))) for k, v in perceptions.items() if v is not None]
         if not valid_perceptions:
             return ""
         
         valid_perceptions.sort(key=lambda x: x[1], reverse=True)
         
-        perceptions_text = ", ".join([f"{name} ({score}/10)" for name, score in valid_perceptions])
+        perceptions_text = ", ".join([f"{name} ({qual})" for name, _, qual in valid_perceptions])
         return f"How I expect others would rate me: {perceptions_text}."
     
     def _encode_time2_satisfaction(self, data: Dict) -> str:
@@ -427,12 +493,15 @@ class PersonaGenerator:
         date_freq = DATE_FREQ_MAP.get(int(data.get('date', 5)), "occasionally")
         go_out_freq = DATE_FREQ_MAP.get(int(data.get('go_out', 3)), "regularly")
         
-        # 种族/宗教重要性
-        imprace = int(data.get('imprace', 5))
-        imprelig = int(data.get('imprelig', 5))
+        # 种族/宗教重要性 - ENHANCEMENT 2: Convert to qualitative
+        imprace = float(data.get('imprace', 5))
+        imprelig = float(data.get('imprelig', 5))
+        imprace_qual = self._score_to_qualitative(imprace)
+        imprelig_qual = self._score_to_qualitative(imprelig)
         
-        # 期望（完整编码，不过滤）
-        exphappy = int(data.get('exphappy', 5))
+        # 期望 - ENHANCEMENT 2: Convert to qualitative
+        exphappy = float(data.get('exphappy', 5))
+        exphappy_qual = self._rating_to_qualitative(exphappy)
         
         # 择偶偏好（完整编码所有分数）
         self_prefs = self._rank_preferences(data, 'attr1_1')
@@ -448,23 +517,23 @@ class PersonaGenerator:
         # 兴趣爱好（完整编码所有评分）
         all_interests = self._encode_all_interests(data)
         
-        # 构建叙事 - 完整编码所有信息
+        # 构建叙事 - ENHANCEMENT 2: Remove ALL numbers
         narrative = f"""I'm a {age}-year-old {gender} studying {field}, with plans to become a {career}. """
         
         if race:
             narrative += f"I'm {race}. "
         
-        # 生活状态（完整保留原始值）
+        # 生活状态 - ENHANCEMENT 2: No numeric ratings
         narrative += f"\n\nIn my daily life, I go out {go_out_freq}, though I only go on dates {date_freq}. "
         narrative += f"I came to this speed dating event to {goal}. "
-        narrative += f"My expected happiness for tonight: {exphappy}/10. "
+        narrative += f"I have {exphappy_qual} expectations for tonight. "
         
-        # 价值观（完整编码，保留原始分数）
-        narrative += f"\n\nImportance of same race in dating: {imprace}/10. "
-        narrative += f"Importance of same religion in dating: {imprelig}/10. "
+        # 价值观 - ENHANCEMENT 2: Qualitative descriptions only
+        narrative += f"\n\nSharing the same race is {imprace_qual} to me in dating. "
+        narrative += f"Sharing the same religion is {imprelig_qual} to me in dating. "
         
-        # 择偶观（完整编码所有偏好分数）
-        narrative += f"\n\nWhat I value in a potential date (out of 100 points total): {self._encode_preferences_complete(self_prefs)}. "
+        # 择偶观 - ENHANCEMENT 2: No point values mentioned
+        narrative += f"\n\nWhat I value in a potential date: {self._encode_preferences_complete(self_prefs)}. "
         
         if opp_sex_prefs:
             narrative += f"\n\nWhat I think the opposite sex looks for: {self._encode_preferences_complete(opp_sex_prefs)}. "
