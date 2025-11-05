@@ -68,16 +68,28 @@ INTEREST_NAMES = {
 
 
 class PersonaGenerator:
-    def __init__(self, pairs_path: str):
+    def __init__(self, pairs_path: str, encoded_narratives_path: Optional[str] = None):
         """
         初始化 Persona 生成器
         
         Args:
             pairs_path: processed_pairs.json 的路径
+            encoded_narratives_path: Optional path to Gemini-encoded narratives JSON
         """
         self.pairs_path = pairs_path
         self.pairs = []
         self.personas = []
+        self.encoded_narratives = {}
+        
+        # Load Gemini-encoded narratives if provided
+        if encoded_narratives_path:
+            print(f"📖 Loading Gemini-encoded narratives from: {encoded_narratives_path}")
+            with open(encoded_narratives_path, 'r', encoding='utf-8') as f:
+                narratives_data = json.load(f)
+                # Convert to dict with iid as key
+                self.encoded_narratives = {str(item['iid']): item['persona_narrative'] 
+                                          for item in narratives_data.values()}
+            print(f"✅ Loaded {len(self.encoded_narratives)} Gemini-encoded narratives")
     
     @staticmethod
     def _score_to_qualitative(score: float) -> str:
@@ -481,6 +493,12 @@ class PersonaGenerator:
         """
         data = person_data['data']
         
+        # ENHANCEMENT 2: Use Gemini-encoded narrative if available
+        iid = str(data.get('iid'))
+        if iid in self.encoded_narratives:
+            print(f"   Using Gemini-encoded narrative for IID {iid}")
+            return self.encoded_narratives[iid]
+        
         # 基本信息
         age = int(data.get('age', 0))
         gender = "woman" if data.get('gender') == 0 else "man"
@@ -787,12 +805,30 @@ REMEMBER: You're {name}, a real {age}yo {gender}. You DON'T know this person yet
 
 def main():
     """主函数"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Generate personas for speed dating simulation")
+    parser.add_argument('--pairs', type=str, default='results/processed_pairs.json',
+                       help='Path to processed pairs JSON file')
+    parser.add_argument('--encoded-narratives', type=str, default=None,
+                       help='Path to Gemini-encoded narratives JSON (optional)')
+    parser.add_argument('--output', type=str, default='results',
+                       help='Output directory for personas')
+    
+    args = parser.parse_args()
+    
     print("🎭 Persona Generator - Phase 1")
     print("=" * 70)
     
+    if args.encoded_narratives:
+        print(f"🤖 Using Gemini-encoded narratives from: {args.encoded_narratives}")
+    else:
+        print("📝 Using rule-based narrative generation")
+    
+    print("=" * 70)
+    
     # 初始化生成器
-    pairs_path = "results/processed_pairs.json"
-    generator = PersonaGenerator(pairs_path)
+    generator = PersonaGenerator(args.pairs, args.encoded_narratives)
     
     # 加载配对数据
     generator.load_pairs()
@@ -801,7 +837,7 @@ def main():
     generator.generate_personas()
     
     # 保存结果
-    output_dir = generator.save_personas()
+    output_dir = generator.save_personas(args.output)
     
     print("\n" + "=" * 70)
     print("✅ Persona generation completed!")

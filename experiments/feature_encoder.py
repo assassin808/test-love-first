@@ -1,6 +1,6 @@
 """
 Feature Encoder - Convert Structured Data to Natural Language
-Using Gemini 2.5 Flash for large context window support
+Using Gemini 2.5 Flash for better rate limits and performance
 
 Purpose:
 - Convert numeric/categorical dating profile data → coherent natural language
@@ -18,6 +18,10 @@ import pandas as pd
 from tqdm.asyncio import tqdm_asyncio
 from openai import AsyncOpenAI
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize OpenRouter client
 client = AsyncOpenAI(
@@ -28,16 +32,30 @@ client = AsyncOpenAI(
 
 def create_encoding_prompt(structured_data: Dict) -> str:
     """
-    Create prompt for Gemini to convert structured profile to natural language.
+    Create prompt for encoding structured persona data into natural language.
+    Uses qualitative descriptors instead of numbers.
     """
-    prompt = f"""You are a professional dating profile writer. Convert the following structured dating profile into a natural, coherent narrative paragraph that someone would use to describe themselves.
+    # Convert numpy types to native Python types for JSON serialization
+    def convert_types(obj):
+        if isinstance(obj, dict):
+            return {k: convert_types(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_types(v) for v in obj]
+        elif hasattr(obj, 'item'):  # numpy types have .item() method
+            return obj.item()
+        else:
+            return obj
+    
+    serializable_data = convert_types(structured_data)
+    
+    prompt = f"""You are helping someone describe their personality and preferences in a natural, authentic way. Convert the following structured profile data into a flowing narrative paragraph.
 
 CRITICAL RULES:
-1. Keep ALL information from the structured data
-2. Remove ALL numbers - convert to qualitative descriptions:
-   - 1-2 → "not at all" / "very low" / "minimal"
-   - 3-4 → "somewhat" / "a little" / "mild"
-   - 5-6 → "moderate" / "decent" / "reasonable"
+1. NEVER include ANY numbers (no "7/10", "5 out of 10", etc.)
+2. Convert numeric scales to qualitative words:
+   - 1-2 → "minimal" / "slight" / "barely"
+   - 3-4 → "somewhat" / "moderate" / "mild"
+   - 5-6 → "fairly" / "reasonably" / "average"
    - 7-8 → "quite" / "strong" / "considerable"
    - 9-10 → "very" / "extremely" / "highly"
 3. Write as a flowing paragraph (NO bullet points)
@@ -45,7 +63,7 @@ CRITICAL RULES:
 5. Make it sound like a person describing themselves authentically
 
 Structured Profile Data:
-{json.dumps(structured_data, indent=2)}
+{json.dumps(serializable_data, indent=2)}
 
 Write the natural language narrative (one coherent paragraph):"""
     
@@ -56,6 +74,19 @@ def create_time2_encoding_prompt(time2_data: Dict, partner_name: str) -> str:
     """
     Create prompt for encoding Time 2 reflection data (post-meeting perception).
     """
+    # Convert numpy types to native Python types for JSON serialization
+    def convert_types(obj):
+        if isinstance(obj, dict):
+            return {k: convert_types(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_types(v) for v in obj]
+        elif hasattr(obj, 'item'):  # numpy types have .item() method
+            return obj.item()
+        else:
+            return obj
+    
+    serializable_data = convert_types(time2_data)
+    
     prompt = f"""You are helping someone describe their thoughts after a speed date. Convert the following post-date reflection data into a natural, flowing paragraph.
 
 CRITICAL RULES:
@@ -66,20 +97,20 @@ CRITICAL RULES:
 5. Describe perception changes and current feelings
 
 Post-Date Reflection Data:
-{json.dumps(time2_data, indent=2)}
+{json.dumps(serializable_data, indent=2)}
 
 Write the reflection paragraph (describing feelings AFTER the date):"""
     
     return prompt
 
 
-async def encode_with_gemini(prompt: str, model_name: str = "google/gemini-2.0-flash-exp:free") -> str:
+async def encode_with_gemini(prompt: str, model_name: str = "google/gemini-2.5-flash") -> str:
     """
     Use Gemini (via OpenRouter) to encode structured data into natural language.
     
     Args:
         prompt: The encoding prompt
-        model_name: Gemini model to use (default: google/gemini-2.0-flash-exp:free for large context)
+        model_name: Gemini model to use (default: google/gemini-2.5-flash for better rate limits)
     
     Returns:
         Natural language narrative

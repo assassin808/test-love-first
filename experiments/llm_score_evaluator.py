@@ -206,8 +206,8 @@ def call_api_with_score_extraction(messages: List[Dict], temperature: float = 0.
     strategies = [
         (300, 1.0),
         (500, 1.0),
-        (800, 1.1),
-        (800, 1.2)
+        (800, 1.5),
+        (800, 2.0)
     ]
     
     for attempt, (max_tokens, rep_penalty) in enumerate(strategies):
@@ -407,80 +407,26 @@ def build_observer_messages(person1_data: Dict, person2_data: Dict, conversation
     return msgs
 
 
-def encode_time2_reflection_to_narrative(time2_data: Dict, partner_name: str = "them") -> str:
+def get_time2_reflection_narrative(person_data: Dict, partner_name: str = "them") -> str:
     """
-    Convert Time 2 reflection data to natural language narrative.
-    Enhancement 5: Stage 2 evaluation with reflection context.
+    Get pre-encoded Time 2 reflection narrative from persona data.
+    Enhancement 5: Stage 2 evaluation with Gemini-encoded reflection context.
     
     Args:
-        time2_data: Dictionary containing satis_2, attr2_1, sinc2_1, etc.
-        partner_name: Name to use for the partner
+        person_data: Person dictionary with 'time2_reflection_narrative' field
+        partner_name: Name to use for the partner (unused, kept for compatibility)
     
     Returns:
-        Natural language paragraph describing post-date reflections
+        Gemini-encoded natural language paragraph describing post-date reflections
     """
-    if not time2_data:
-        return ""
+    # Use pre-encoded narrative if available
+    narrative = person_data.get('time2_reflection_narrative', '')
+    if narrative:
+        return narrative
     
-    # Helper function to convert scores to qualitative
-    def score_to_qual(score):
-        if score is None:
-            return None
-        score = float(score)
-        if score <= 2:
-            return "very low"
-        elif score <= 4:
-            return "somewhat low"
-        elif score <= 6:
-            return "moderate"
-        elif score <= 8:
-            return "quite high"
-        else:
-            return "very high"
-    
-    narrative_parts = []
-    
-    # Satisfaction
-    satisfaction = time2_data.get('satisfaction', {})
-    satis_2 = satisfaction.get('satis_2')
-    if satis_2 is not None:
-        satis_qual = score_to_qual(satis_2)
-        narrative_parts.append(f"Your overall satisfaction with how the date went is {satis_qual}.")
-    
-    # Updated perception of partner (attr2_*, sinc2_*, etc.)
-    updated_prefs = time2_data.get('updated_preferences_opposite', {})
-    if updated_prefs:
-        traits = []
-        for trait_name, field_name in [
-            ('attractive', 'attractiveness'),
-            ('sincere', 'sincerity'),
-            ('intelligent', 'intelligence'),
-            ('fun', 'fun'),
-            ('ambitious', 'ambition')
-        ]:
-            score = updated_prefs.get(field_name)
-            if score is not None:
-                qual = score_to_qual(score)
-                traits.append(f"{qual} {trait_name}")
-        
-        if traits:
-            if len(traits) == 1:
-                narrative_parts.append(f"You now see {partner_name} as {traits[0]}.")
-            elif len(traits) == 2:
-                narrative_parts.append(f"You now see {partner_name} as {traits[0]} and {traits[1]}.")
-            else:
-                narrative_parts.append(f"You now see {partner_name} as {', '.join(traits[:-1])}, and {traits[-1]}.")
-    
-    # Shared interests perception
-    shared_int = updated_prefs.get('shared_interests')
-    if shared_int is not None:
-        shared_qual = score_to_qual(shared_int)
-        if float(shared_int) >= 7:
-            narrative_parts.append(f"You noticed {shared_qual} shared interests between you two.")
-        elif float(shared_int) <= 3:
-            narrative_parts.append(f"You noticed {shared_qual} common ground between you.")
-    
-    return " ".join(narrative_parts) if narrative_parts else ""
+    # Fallback: return empty string if no pre-encoded narrative
+    # (This shouldn't happen if personas.json was properly encoded)
+    return ""
 
 
 def get_participant_score_prompt(person_data: Dict, partner_data: Dict, conversation: List[Dict]) -> str:
@@ -534,11 +480,8 @@ def get_participant_score_prompt_stage2(person_data: Dict, partner_data: Dict, c
     partner_gender = "him" if partner_data.get('gender') == 1 else "her"
     partner_name = "them"  # Generic pronoun
     
-    # Encode Time 2 reflection
-    reflection_context = encode_time2_reflection_to_narrative(
-        person_data.get('time2_reflection', {}), 
-        partner_name
-    )
+    # Get pre-encoded Time 2 reflection narrative
+    reflection_context = get_time2_reflection_narrative(person_data, partner_name)
 
     prompt = (
         "You are Person A in a speed dating session. You've now had time to reflect on the date. "
@@ -611,18 +554,15 @@ def get_observer_score_prompt_stage2(person1_data: Dict, person2_data: Dict, con
     p2 = person2_data.get('persona_narrative', '').strip()
     
     # Combine reflection data from both participants
-    time2_p1 = person1_data.get('time2_reflection', {})
-    time2_p2 = person2_data.get('time2_reflection', {})
-    
     reflection_parts = []
     
-    # Person 1's reflection
-    refl1 = encode_time2_reflection_to_narrative(time2_p1, "Person 2")
+    # Person 1's reflection (pre-encoded)
+    refl1 = get_time2_reflection_narrative(person1_data, "Person 2")
     if refl1:
         reflection_parts.append(f"Person 1's reflection: {refl1}")
     
-    # Person 2's reflection
-    refl2 = encode_time2_reflection_to_narrative(time2_p2, "Person 1")
+    # Person 2's reflection (pre-encoded)
+    refl2 = get_time2_reflection_narrative(person2_data, "Person 1")
     if refl2:
         reflection_parts.append(f"Person 2's reflection: {refl2}")
     
@@ -660,11 +600,8 @@ def build_participant_messages_stage2(person_data: Dict, partner_data: Dict, con
     persona_block = (person_data.get('persona_narrative') or '').strip()
     partner_gender = "him" if partner_data.get('gender') == 1 else "her"
     
-    # Encode Time 2 reflection
-    reflection_context = encode_time2_reflection_to_narrative(
-        person_data.get('time2_reflection', {}), 
-        "them"
-    )
+    # Get pre-encoded Time 2 reflection narrative
+    reflection_context = get_time2_reflection_narrative(person_data, "them")
     
     msgs = [
         {"role": "system", "content": (
@@ -710,15 +647,12 @@ def build_observer_messages_stage2(person1_data: Dict, person2_data: Dict, conve
             conversation_lines.append(f"{speaker}: {text}")
     conversation_text = "\n".join(conversation_lines)
     
-    # Encode reflections from both participants
-    time2_p1 = person1_data.get('time2_reflection', {})
-    time2_p2 = person2_data.get('time2_reflection', {})
-    
+    # Get pre-encoded reflections from both participants
     reflection_parts = []
-    refl1 = encode_time2_reflection_to_narrative(time2_p1, "Person 2")
+    refl1 = get_time2_reflection_narrative(person1_data, "Person 2")
     if refl1:
         reflection_parts.append(f"Person 1's reflection: {refl1}")
-    refl2 = encode_time2_reflection_to_narrative(time2_p2, "Person 1")
+    refl2 = get_time2_reflection_narrative(person2_data, "Person 1")
     if refl2:
         reflection_parts.append(f"Person 2's reflection: {refl2}")
     reflection_context = "\n".join(reflection_parts) if reflection_parts else "Both participants have reflected on the experience."
@@ -810,6 +744,8 @@ def evaluate_with_scores(
         'observer_scores': [],     # 存储观察员评分
         'advanced_observer_scores': [],  # 存储高级观察员评分（带ICL）
         'ground_truth': [],        # 真实标签
+        'ground_truth_person1_like': [],  # Person 1 ground truth like scores
+        'ground_truth_person2_like': [],  # Person 2 ground truth like scores
         'pair_ids': []             # pair ID
     }
     
@@ -849,10 +785,15 @@ def evaluate_with_scores(
         person2_data = person_lookup[pair_key]['person2']
 
         rounds = conv_data.get('rounds', [])
-        ground_truth = conv_data.get('ground_truth', {}).get('match', None)
-        if ground_truth is None:
+        ground_truth_dict = conv_data.get('ground_truth', {})
+        ground_truth_match = ground_truth_dict.get('match', None)
+        if ground_truth_match is None:
             print(f"  Warning: Missing ground truth 'match' for {pair_id}, skipping...")
             return None
+        
+        # Extract like scores from ground truth
+        person1_like = ground_truth_dict.get('person1_ratings', {}).get('like', None)
+        person2_like = ground_truth_dict.get('person2_ratings', {}).get('like', None)
 
         print(f"[{index}/{total}] Evaluating {pair_id}...")
 
@@ -970,14 +911,20 @@ def evaluate_with_scores(
                     'response': f"Score: {so_adv}"
                 }
 
-            print(f"  Ground truth: {'Match' if ground_truth else 'No match'}\n")
+            print(f"  Ground truth: {'Match' if ground_truth_match else 'No match'}")
+            if person1_like is not None and person2_like is not None:
+                print(f"  Ground truth like scores: Person1={person1_like:.1f}, Person2={person2_like:.1f}\n")
+            else:
+                print()
 
             return {
                 'pair_id': pair_id,
                 'participant_entry': participant_entry,
                 'observer_entry': observer_entry,
                 'advanced_observer_entry': advanced_observer_entry,
-                'ground_truth': ground_truth
+                'ground_truth': ground_truth_match,
+                'ground_truth_person1_like': person1_like,
+                'ground_truth_person2_like': person2_like
             }
         except Exception as e:
             print(f"  Error evaluating {pair_id}: {e}\n")
@@ -997,6 +944,8 @@ def evaluate_with_scores(
             if res.get('advanced_observer_entry') is not None:
                 results['advanced_observer_scores'].append(res['advanced_observer_entry'])
             results['ground_truth'].append(res['ground_truth'])
+            results['ground_truth_person1_like'].append(res.get('ground_truth_person1_like'))
+            results['ground_truth_person2_like'].append(res.get('ground_truth_person2_like'))
             results['pair_ids'].append(res['pair_id'])
     
     # 计算评估指标
@@ -1099,8 +1048,73 @@ def evaluate_with_scores(
         cm_advanced_observer = np.array([[0,0],[0,0]])
         print("\n3. ADVANCED OBSERVER METHOD: No scores available.")
     
+    # Calculate like score correlations
+    print("\n" + "=" * 70)
+    print("LIKE SCORE CORRELATIONS")
+    print("=" * 70)
+    
+    gt_person1_likes = np.array([x for x in results['ground_truth_person1_like'] if x is not None])
+    gt_person2_likes = np.array([x for x in results['ground_truth_person2_like'] if x is not None])
+    
+    if participant_probs.size and len(gt_person1_likes) > 0:
+        # Get predicted individual scores
+        pred_person1_scores = np.array([s['person1_score'] for s in results['participant_scores']])
+        pred_person2_scores = np.array([s['person2_score'] for s in results['participant_scores']])
+        
+        # Calculate correlations for Person 1
+        from scipy.stats import pearsonr
+        if len(pred_person1_scores) == len(gt_person1_likes) and len(gt_person1_likes) > 1:
+            corr_p1, pval_p1 = pearsonr(pred_person1_scores, gt_person1_likes)
+            print(f"\n4. PARTICIPANT METHOD - Like Score Correlations:")
+            print(f"   Person 1: Pearson r = {corr_p1:.3f} (p = {pval_p1:.4f})")
+            
+            if len(pred_person2_scores) == len(gt_person2_likes) and len(gt_person2_likes) > 1:
+                corr_p2, pval_p2 = pearsonr(pred_person2_scores, gt_person2_likes)
+                print(f"   Person 2: Pearson r = {corr_p2:.3f} (p = {pval_p2:.4f})")
+                
+                # Overall correlation (average of both)
+                avg_corr = (corr_p1 + corr_p2) / 2
+                print(f"   Average correlation: {avg_corr:.3f}")
+                
+                # MAE (Mean Absolute Error)
+                mae_p1 = np.mean(np.abs(pred_person1_scores - gt_person1_likes))
+                mae_p2 = np.mean(np.abs(pred_person2_scores - gt_person2_likes))
+                print(f"   MAE Person 1: {mae_p1:.2f}/10")
+                print(f"   MAE Person 2: {mae_p2:.2f}/10")
+                print(f"   Average MAE: {(mae_p1 + mae_p2) / 2:.2f}/10")
+        else:
+            print("\n4. PARTICIPANT METHOD - Like Score Correlations: Insufficient data for correlation")
+    else:
+        print("\n4. PARTICIPANT METHOD - Like Score Correlations: No data available")
+    
     # 保存详细结果
     output_path = f"{output_dir}/llm_score_evaluation_stage{stage}.json"
+    # Calculate like score correlation metrics for output
+    like_score_metrics = None
+    if participant_probs.size and len(gt_person1_likes) > 0:
+        from scipy.stats import pearsonr
+        pred_person1_scores = np.array([s['person1_score'] for s in results['participant_scores']])
+        pred_person2_scores = np.array([s['person2_score'] for s in results['participant_scores']])
+        
+        if len(pred_person1_scores) == len(gt_person1_likes) and len(gt_person1_likes) > 1:
+            corr_p1, pval_p1 = pearsonr(pred_person1_scores, gt_person1_likes)
+            mae_p1 = float(np.mean(np.abs(pred_person1_scores - gt_person1_likes)))
+            
+            if len(pred_person2_scores) == len(gt_person2_likes) and len(gt_person2_likes) > 1:
+                corr_p2, pval_p2 = pearsonr(pred_person2_scores, gt_person2_likes)
+                mae_p2 = float(np.mean(np.abs(pred_person2_scores - gt_person2_likes)))
+                
+                like_score_metrics = {
+                    'person1_correlation': float(corr_p1),
+                    'person1_p_value': float(pval_p1),
+                    'person1_mae': mae_p1,
+                    'person2_correlation': float(corr_p2),
+                    'person2_p_value': float(pval_p2),
+                    'person2_mae': mae_p2,
+                    'average_correlation': float((corr_p1 + corr_p2) / 2),
+                    'average_mae': float((mae_p1 + mae_p2) / 2)
+                }
+    
     output_data = {
         'participant_method': {
             'scores': results['participant_scores'],
@@ -1111,7 +1125,8 @@ def evaluate_with_scores(
                 'f1': float(f1_score(y_true, participant_preds, zero_division=0)) if participant_probs.size else None,
                 'auc_roc': (float(roc_auc_score(y_true, participant_probs)) if participant_probs.size and len(set(y_true)) > 1 else None),
                 'pr_auc': (float(average_precision_score(y_true, participant_probs)) if participant_probs.size else None),
-                'confusion_matrix': cm_participant.tolist() if participant_probs.size else None
+                'confusion_matrix': cm_participant.tolist() if participant_probs.size else None,
+                'like_score_correlations': like_score_metrics
             },
             'curves': (
                 {
@@ -1181,6 +1196,8 @@ def evaluate_with_scores(
             )
         },
         'ground_truth': results['ground_truth'],
+        'ground_truth_person1_like': results['ground_truth_person1_like'],
+        'ground_truth_person2_like': results['ground_truth_person2_like'],
         'pair_ids': results['pair_ids']
     }
     

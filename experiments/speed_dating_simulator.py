@@ -187,7 +187,7 @@ class SpeedDatingSimulator:
 Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take based on YOUR persona?), then give your <RESPONSE> (introduce yourself naturally - remember you DON'T know this person at all!)"""
         person1_history.append({"role": "user", "content": opening_prompt})
         
-        person1_result = self.call_openrouter_api(person1_history, temperature=0.3)
+        person1_result = self.call_openrouter_api(person1_history, temperature=0.6)
         person1_history.append({"role": "assistant", "content": person1_result['full_text']})
         
         print(f"   Person 1 [THINKING]: {person1_result['inner_thought'][:80]}...")
@@ -209,7 +209,7 @@ Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take b
             
             # Person 2 回应（看到 Person 1 的 response 部分）
             person2_history.append({"role": "user", "content": person1_result['response']})
-            person2_result = self.call_openrouter_api(person2_history, temperature=0.3)
+            person2_result = self.call_openrouter_api(person2_history, temperature=0.6)
             person2_history.append({"role": "assistant", "content": person2_result['full_text']})
             
             print(f"   Person 2 [THINKING]: {person2_result['inner_thought'][:80]}...")
@@ -226,7 +226,7 @@ Start with your <INNER_THOUGHT> (what's your strategy? what tone will you take b
             
             # Person 1 回应（看到 Person 2 的 response 部分）
             person1_history.append({"role": "user", "content": person2_result['response']})
-            person1_result = self.call_openrouter_api(person1_history, temperature=0.3)
+            person1_result = self.call_openrouter_api(person1_history, temperature=0.6)
             person1_history.append({"role": "assistant", "content": person1_result['full_text']})
             
             print(f"   Person 1 [THINKING]: {person1_result['inner_thought'][:80]}...")
@@ -265,7 +265,7 @@ Use this format:
 </REASONING>"""
         
         person1_history.append({"role": "user", "content": person1_eval_prompt})
-        person1_eval = self.call_openrouter_api(person1_history, temperature=0.3)
+        person1_eval = self.call_openrouter_api(person1_history, temperature=0.6)
         
         # Debug: Print raw response
         print(f"\n🔍 DEBUG - Person 1 Eval Response:")
@@ -290,7 +290,7 @@ Use this format:
 </REASONING>"""
         
         person2_history.append({"role": "user", "content": person2_eval_prompt})
-        person2_eval = self.call_openrouter_api(person2_history, temperature=0.3)
+        person2_eval = self.call_openrouter_api(person2_history, temperature=0.6)
         
         # Debug: Print raw response
         print(f"\n🔍 DEBUG - Person 2 Eval Response:")
@@ -323,7 +323,7 @@ Provide your expert evaluation:
 </ANALYSIS>"""
         
         observer_history = [{"role": "user", "content": observer_prompt}]
-        observer_eval = self.call_openrouter_api(observer_history, temperature=0.3)
+        observer_eval = self.call_openrouter_api(observer_history, temperature=0.6)
         
         # Debug: Print raw response
         print(f"\n🔍 DEBUG - Observer Eval Response:")
@@ -677,8 +677,8 @@ def main():
         num_rounds = 10
     elif mode == "3":
         num_pairs = None  # All pairs
-        max_workers = 10  # More threads for full run
-        num_rounds = 10
+        max_workers = 12  # More threads for full run
+        num_rounds = 8
     else:
         print("Invalid mode, using test mode (1 pair, 2 rounds)")
         num_pairs = 1
