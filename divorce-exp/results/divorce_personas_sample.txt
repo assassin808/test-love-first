@@ -1,0 +1,127 @@
+================================================================================
+SAMPLE PERSONAS (First 3 Couples)
+================================================================================
+
+
+================================================================================
+Couple 0 (Divorced: 0)
+================================================================================
+
+--- HUSBAND ---
+I am Husband in a marriage. Here's how I experience our relationship:
+
+**How I Handle Conflict:**
+I try to stay calm during conflicts.
+
+**Our Values & Compatibility:**
+We differ significantly on shared goals, entertainment preferences.
+
+**Our Emotional Connection:**
+We have a moderate emotional connection.
+
+**Communication Patterns:**
+I sometimes get defensive when criticized. I sometimes bring up their past failures during arguments.
+
+**My Inner Truth:**
+When facing major life challenges, I tend to follow my gut instincts rather than just what I "should" do. I know my limits and what I can tolerate in this relationship.
+
+--- WIFE ---
+I am Wife in a marriage. Here's how I experience our relationship:
+
+**How I Handle Conflict:**
+I try to stay calm during conflicts.
+
+**Our Values & Compatibility:**
+We differ significantly on shared goals, entertainment preferences.
+
+**Our Emotional Connection:**
+We have a moderate emotional connection.
+
+**Communication Patterns:**
+I sometimes get defensive when criticized. I sometimes bring up their past failures during arguments.
+
+**My Inner Truth:**
+When facing major life challenges, I tend to follow my gut instincts rather than just what I "should" do. I know my limits and what I can tolerate in this relationship.
+
+
+================================================================================
+Couple 1 (Divorced: 0)
+================================================================================
+
+--- HUSBAND ---
+I am Husband in a marriage. Here's how I experience our relationship:
+
+**How I Handle Conflict:**
+I sometimes raise my voice or use negative expressions when we fight. I sometimes go silent or need space when we're arguing. I'm usually able to apologize and work things out after we argue.
+
+**Our Values & Compatibility:**
+My spouse and I are aligned on shared goals, entertainment preferences.
+
+**Our Emotional Connection:**
+We have a moderate emotional connection.
+
+**Communication Patterns:**
+In conflicts, I tend to feel I'm right and defend my position strongly. I sometimes bring up their past failures during arguments.
+
+**My Inner Truth:**
+When facing major life challenges, I tend to follow my gut instincts rather than just what I "should" do. I know my limits and what I can tolerate in this relationship.
+
+--- WIFE ---
+I am Wife in a marriage. Here's how I experience our relationship:
+
+**How I Handle Conflict:**
+I sometimes raise my voice or use negative expressions when we fight. I sometimes go silent or need space when we're arguing. I'm usually able to apologize and work things out after we argue.
+
+**Our Values & Compatibility:**
+My spouse and I are aligned on shared goals, entertainment preferences.
+
+**Our Emotional Connection:**
+We have a moderate emotional connection.
+
+**Communication Patterns:**
+In conflicts, I tend to feel I'm right and defend my position strongly. I sometimes bring up their past failures during arguments.
+
+**My Inner Truth:**
+When facing major life challenges, I tend to follow my gut instincts rather than just what I "should" do. I know my limits and what I can tolerate in this relationship.
+
+
+================================================================================
+Couple 2 (Divorced: 0)
+================================================================================
+
+--- HUSBAND ---
+I am Husband in a marriage. Here's how I experience our relationship:
+
+**How I Handle Conflict:**
+I sometimes raise my voice or use negative expressions when we fight. I sometimes go silent or need space when we're arguing.
+
+**Our Values & Compatibility:**
+We have mixed compatibility on core values.
+
+**Our Emotional Connection:**
+We have a moderate emotional connection.
+
+**Communication Patterns:**
+I sometimes bring up their past failures during arguments.
+
+**My Inner Truth:**
+When facing major life challenges, I tend to follow my gut instincts rather than just what I "should" do. I know my limits and what I can tolerate in this relationship.
+
+--- WIFE ---
+I am Wife in a marriage. Here's how I experience our relationship:
+
+**How I Handle Conflict:**
+I sometimes raise my voice or use negative expressions when we fight. I sometimes go silent or need space when we're arguing.
+
+**Our Values & Compatibility:**
+We have mixed compatibility on core values.
+
+**Our Emotional Connection:**
+We have a moderate emotional connection.
+
+**Communication Patterns:**
+I sometimes bring up their past failures during arguments.
+
+**My Inner Truth:**
+When facing major life challenges, I tend to follow my gut instincts rather than just what I "should" do. I know my limits and what I can tolerate in this relationship.
+

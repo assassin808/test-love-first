@@ -1,0 +1,63 @@
+================================================================================
+SAMPLE SIMULATION (First Couple, First Event)
+================================================================================
+
+Couple 136 (Divorced: 1)
+Event: career_conflict_&_relocation_dilemma
+
+
+--- Round 1 ---
+Type: scene_setting
+Content: The scent of brewing coffee, usually a comforting promise of a slow morning, hung heavy in the air of their sun-drenched kitchen. Dust motes danced in the shafts of light filtering through the blinds, illuminating the worn oak of their breakfast table. A single, official-looking envelope, stark white against the wood, lay open, its contents spread out beside a half-eaten piece of toast.
+
+--- Round 2 ---
+Speaker: HUSBAND
+Inner Thought: [Self-check: My persona emphasizes staying calm in conflict, difficulty apologizing, differing values, a moderate emotional connection, typical communication, and following gut instincts. The presence of an official envelope suggests a significant life event, possibly a challenge. My gut instinct is to assess the situation pragmatically and not get overly emotional. My difficulty with apologies means I won't be the first to offer comfort or reassurance. The differing values mean I might not immediately see eye-to-eye on how to handle this, and the moderate emotional connection means I won't be rushing to offer deep emotional support. I need to understand what this means for us, based on my own limits and what I can tolerate.]
+
+[My true feelings are a mix of apprehension and a desire for clarity. This envelope feels like a turning point, and I'm not entirely sure where it's leading us. I don't want to jump to conclusions, but I also don't want to be blindsided. My immediate priority is to understand the facts and how they impact our future, rather than dwelling on emotional reactions.]
+Public Response: I walked into the kitchen, saw the envelope and the papers spread out. I picked up one of the documents, scanned it briefly, then looked over at you. "What's this all about?" I asked, my tone neutral, though my mind was already trying to process the implications. "Looks like some kind of official notice."
+
+--- Round 2 ---
+Speaker: WIFE
+Inner Thought: [Self-check: My persona emphasizes staying calm during conflict, but also difficulty apologizing or restarting conversations. The significant differences in our values and goals, and the moderate emotional connection, mean I'm used to navigating these kinds of situations with a degree of detachment. My inner truth about following my gut and knowing my limits is also relevant here. This situation feels like a significant challenge, and my gut is telling me to observe and process before reacting too strongly. The fact that we have different shared goals means this kind of unexpected news might hit us differently, and I need to see how he reacts before I commit to a path.]
+[My true feeling is a knot of unease, but also a strange sense of preparedness. I've always known we're not perfectly aligned, and this feels like it could be another point of divergence, or perhaps a catalyst. I'm not immediately panicking, but I'm definitely bracing myself.]
+Public Response: I looked up from where I was wiping down the counter, my movements slow and deliberate. I watched him pick up the paper, my gaze steady. "It's... a notice," I said, my voice even. "About the house." I gestured vaguely towards the papers with the dishcloth. "It seems there's a problem that needs addressing." I didn't offer more, waiting to see how he would interpret it, how he would react.
+
+--- Round 2 ---
+Type: environment_reaction
+Content: The previously mundane kitchen, filled with the quiet hum of domesticity, now crackles with unspoken tension. The sterile light reflecting off the scattered official documents casts a harsh glare, transforming the familiar space into a zone of uncertainty. The air, once comfortably still, grows heavy with apprehension as the weight of the "problem" descends.
+
+--- Round 3 ---
+Speaker: HUSBAND
+Inner Thought: [Self-check: My persona emphasizes staying calm in conflict, difficulty apologizing, differing values, a moderate emotional connection, typical communication, and following gut instincts. The wife has presented the information about the house problem. My initial reaction is to stay calm and gather facts, as per usual. I'm not going to immediately apologize or offer comfort, given my difficulty with that. The "problem" with the house might fall into the category of something we differ on how to handle, so I'm not expecting immediate alignment. My gut instinct is to assess the practicalities and what needs to be done, rather than getting bogged down in emotions. I need to figure out the scope of this issue and what my tolerance level is for dealing with it.]
+
+[My true feelings are a sense of unease. This isn't something I can ignore or push aside. My gut tells me this is going to be complicated, and I'm already feeling the familiar resistance to getting deeply involved in the emotional fallout. I need to understand the concrete steps required, not just the worry.]
+Public Response: I picked up another document, my brow furrowed slightly. "A problem? What kind of problem? Is it something that needs immediate action, or is it a long-term thing?" I kept my voice even, focusing on the practicalities. "We need to understand the details before we can figure out what to do."
+
+--- Round 3 ---
+Speaker: WIFE
+Inner Thought: [Self-check: My persona prioritizes staying calm during conflict, which I'm doing by not immediately launching into accusations or demands. My difficulty in apologizing or restarting conversations means I won't be the one pushing for a detailed discussion if he's not already there. The significant differences in our values and goals mean I'm not surprised by potential complications, and my inner truth of following my gut and knowing my limits means I'm assessing the situation before committing to a course of action. I need to see how he wants to approach this, as restarting a conversation if it goes poorly will be hard for me. His focus on practicalities aligns with a typical communication pattern, so I'll respond in kind, but I'm also listening to my gut about the underlying seriousness.]
+[My gut is telling me this is more than just a minor inconvenience. There's a weight to this that feels significant, and I'm already anticipating that our differing priorities might make resolving it difficult. I'm trying to remain composed, but a part of me is already preparing for a lengthy and potentially draining process.]
+Public Response: I put the dishcloth down and walked closer to the table, looking at the papers he was holding. "It seems to be some kind of structural issue, from what I can gather," I said, my voice still level. "The notice mentions inspections and potential repairs. It's not entirely clear if it's immediate or long-term from this first read. We'll need to go through it more thoroughly." I paused, then added, "What do you think we should do first?"
+
+--- Round 4 ---
+Speaker: HUSBAND
+Inner Thought: [Self-check: My persona emphasizes staying calm in conflict, difficulty apologizing, differing values, a moderate emotional connection, typical communication, and following gut instincts. My wife is asking for my opinion on what to do first. My difficulty with apologies means I won't be the one to initiate a deep emotional discussion or offer immediate reassurance. The differing values mean I might not immediately agree on the best course of action, and my gut instinct is to focus on the practical steps. I need to assess the situation from a logical standpoint, considering what is within my tolerance. I'm not going to pretend to have all the answers or be overly emotional about this.]
+
+[My true feelings are a mix of annoyance at the inconvenience and a pragmatic desire to get this sorted. This is a problem, and problems require solutions. I don't want to get caught up in worrying or emotional discussions that won't solve anything. My gut is telling me to focus on the facts and the necessary actions. I'm not going to overcomplicate this with feelings.]
+Public Response: "First, we need to read it thoroughly," I said, picking up another sheet from the pile. "Understand exactly what the issue is, what the recommended actions are, and what the timeline is. Then, we can decide on the next steps. No point in worrying about it until we know the facts." I began to read the document in my hands, my focus intense.
+
+--- Round 4 ---
+Speaker: WIFE
+Inner Thought: [Self-check: My persona prioritizes staying calm, and I'm doing that by not interrupting him and letting him focus on the facts. My difficulty in apologizing or restarting conversations means I won't push for emotional processing if he's focused on logic. The fact that we have different shared goals makes me wary of jumping to conclusions or making assumptions about how we'll handle this together. My inner truth of following my gut and knowing my limits means I'm observing his approach and waiting to see if it aligns with what I feel is necessary. Right now, his focus on the facts is acceptable, because it's a necessary first step, and I'm not yet at a point where I need to restart a difficult conversation.]
+[My gut is telling me this is going to be a headache. I'm not surprised that we're facing a problem with the house, given our differing approaches to things, but I am feeling a sense of resignation. I’m trying to stay neutral because I know how hard it is for me to initiate reconciliation after a disagreement, and I don't want to create a situation where I feel I have to apologize first if things go south. I'm just observing and processing for now.]
+Public Response: I nodded, watching him read. I moved a few of the papers into a neater stack, creating a small amount of order on the table. I didn't speak, just waited, my attention on him and his absorption of the information. My mind was already beginning to catalog the potential implications, not in a panicked way, but with a quiet assessment of what this might mean.
+
+--- Round 4 ---
+Type: environment_reaction
+Content: The initial tension of the unknown begins to dissipate as the husband's focused reading establishes a sense of groundedness. The atmosphere shifts from anxious anticipation to a more measured, analytical calm, with the wife's quiet organization mirroring the developing attempt to bring order to the situation.
+
+--- Round 5 ---
+Speaker: HUSBAND
+Inner Thought: [No inner thought captured]
+Public Response: "We'll deal with it when we have to," I said, still looking at the papers. "For now, let's just get through breakfast. I'll look at it again later today." I put the documents down on the table, the implication being that the conversation was over for the moment.
