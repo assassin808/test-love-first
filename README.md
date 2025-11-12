@@ -19,10 +19,11 @@ This mimics real dating: initial impressions vs. reflections after the date.
 
 ---
 
-<img width="1624" height="1056" alt="Screenshot 2025-11-12 at 00 25 47" src="https://github.com/user-attachments/assets/1da6f896-804d-4775-9023-13fa684a59e4" />
-<img width="1624" height="1056" alt="Screenshot 2025-11-12 at 00 25 42" src="https://github.com/user-attachments/assets/a812bd1e-9a60-4db7-bfd8-ac66335706fd" />
-<img width="1624" height="1056" alt="Screenshot 2025-11-12 at 00 25 10" src="https://github.com/user-attachments/assets/f3ab32e7-8696-4b9f-a7a3-261231e4ad76" />
+<img width="1624" height="1056" alt="Screenshot 2025-11-12 at 00 25 42" src="https://github.com/user-attachments/assets/68b4ee40-a490-41b4-8b06-61cb8f7067cc" />
 
+<img width="1624" height="1056" alt="Screenshot 2025-11-12 at 00 25 47" src="https://github.com/user-attachments/assets/c4fef63d-aaaa-4497-b147-01b2d9def143" />
+
+<img width="1624" height="1056" alt="Screenshot 2025-11-12 at 00 25 10" src="https://github.com/user-attachments/assets/2da7bf3b-5955-4ad9-926e-c09ba17ada91" />
 
 ## 📊 Key Results
 
